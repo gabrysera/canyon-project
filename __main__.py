@@ -52,8 +52,9 @@ def create_adjacency_matrix(W, pillars, disks, max_r):
         print(p.dict)
 
 def create_graph(W, pillars, disks):
-    #store pillars optimal distances/costs
-    #after a path is found, optimizie it (checks if you can reduce cost)
+    #store pillars optimal distances
+    #only store distances, and then while you run the search you add cost depending on the actual disk
+    #after a path is found, optimizie it (checks if you can reduce cost) 
     disks = sorted(disks)
     max_r = disks[-1][0]
     create_adjacency_matrix(W, pillars, disks, max_r)
