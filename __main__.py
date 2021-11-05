@@ -20,8 +20,6 @@ class Pillar(object):
         self.dict = {}
 
     def set_reachable_node(self, p, dist):
-        #for r in reachable_pillars:
-            #self.dict[r[0]] = r[1]
         self.dict[p] = dist
 
 def distance(p1,p2):
@@ -45,23 +43,17 @@ def reachable_pillars(p, pillars, threshold, disks):
             p0.set_reachable_node(p, cost)
             p.set_reachable_node(p0, cost)
     return res
-    #return map(lambda p0: (p0, min_cost(p0, p, disks)) ,filter(lambda p0: distance(p0, p) <= threshold, pillars))
 
 def create_adjacency_matrix(W, pillars, disks, max_r):
     start_index = 0
     for p in pillars:
         start_index += 1
         reachable = reachable_pillars(p, pillars[start_index:], 2*max_r, disks)
-        #p.set_reachable_nodes(reachable)
         print(p.dict)
 
 def create_graph(W, pillars, disks):
-    #pillar X_i, Y_i can only touch pillars at 
-
-    #2) determine if the graph would be sparse or dense
-    #3) build adjecency data structure
-    #4) djikstra
-    #pillars = sorted(pillars)
+    #store pillars optimal distances/costs
+    #after a path is found, optimizie it (checks if you can reduce cost)
     disks = sorted(disks)
     max_r = disks[-1][0]
     create_adjacency_matrix(W, pillars, disks, max_r)
