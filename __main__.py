@@ -14,7 +14,8 @@ class Pillar(object):
         and the distance associated to reach it. """
         self.dict[p] = possible_disks
 
-    
+    def set_starting_disk(self, disk):
+        self.starting_disk = disk
 
 class Path(object):
     
@@ -64,16 +65,15 @@ def create_adjacency_matrix(W, pillars, disks_pairs, max_r, disks):
     values including a nested dictionary of the nodes accessible to it and the cost to access it. """
     start_index = 0
     starting_pillars = []
-    not_starting_pillars = []
     for p in pillars:
         if p.y <= max_r:
             p.start = True
+            p.set_starting_disk(cheaper_disk(disks, p))
             starting_pillars.append(p)
-        else:
-            not_starting_pillars.append(p)
+
         start_index += 1   
         reachable_pillars(p, pillars[start_index:], 2*max_r, disks_pairs) #instead of using max_r can we not use dist bbetween the points as threshold directly
-    return (starting_pillars, not_starting_pillars)
+    return starting_pillars
 
 def disks_combinations(disks):
     combinations = []
@@ -96,7 +96,7 @@ def create_graph(W, pillars, disks):
     disks = sorted(disks)
     max_r = disks[-1][0]
     disks_pairs = sorted(disks_combinations(disks), key=lambda x: x[2], reverse=True) #here x[2] is the total size of both discs
-    divided_pillars = create_adjacency_matrix(W, pillars, disks_pairs, max_r, disks)#note: this functions returns two lists, not one, but i believe the second one is being ignored here
+    starting_pillars = create_adjacency_matrix(W, pillars, disks_pairs, max_r, disks)#note: this functions returns two lists, not one, but i believe the second one is being ignored here
     for p in pillars:
         print(p.x,p.y)
         items = p.dict.items()
@@ -105,7 +105,7 @@ def create_graph(W, pillars, disks):
             print(i[0].x,i[0].y,i[1]) 
             print("\n")
         print("\n")
-    return divided_pillars
+    return starting_pillars
 
 def read_input(): 
     """read the standard input and store pillars using pillar class, and then group them in a list, 
@@ -126,47 +126,27 @@ def read_input():
 
     return (y_goal, pillars, disks)
 
-def divide_pillars(pillars):
-    """[summary]
-
-    Args:
-        pillars ([type]): [description]
-
-    Returns:
-        [type]: [description]
-    """
-    start_pillars = []
-    not_start_pillars = []
-    for p in pillars:
-        if p.start:
-            start_pillars.append(p)
-        else:
-            not_start_pillars.append(p)
-    return (start_pillars, not_start_pillars)
-
-def search (divided_pillars, disks):
-    queue = []
-    for p in divided_pillars[1]:
-        queue.append(p)
-    
+def search (starting_pillars, disks, pillars):
+    starting_queue = []
+    for p in starting_pillars:
+        starting_queue.append(p)
 
 
-def search_path(W, pillars, disks):
+def search_path(W, starting_pillars, disks):
     """search the least expensive path in the graph
 
     Args:
         W (Int): canyon goal
     """
-    divided_pillars = divide_pillars(pillars) #the function returns two, not one list, but i believe the second one is being ignored here
-    search(divided_pillars, disks)
+    search(starting_pillars, disks)
 
 
 def main():
     """main function of the project, read the input, prepare the canyon graph and search the graph
     """
     (W, pillars, disks) = read_input()
-    create_graph(W, pillars, disks)
-    search_path(W,pillars, disks)
+    starting_pillars = create_graph(W, pillars, disks)
+    search_path(W, starting_pillars, disks, pillars)
 
 if __name__ == "__main__":
     main()
