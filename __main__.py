@@ -138,13 +138,18 @@ def search (starting_pillars, disks, pillars):
 
     paths_queue = PriorityQueue()
     for p in starting_pillars:
+        print('uno')
         path = Path(p)
         print(path)
         paths_queue.put(PrioritizedItem(path.cost, path))
 
-    print(paths_queue.qsize())
-    path = paths_queue.get()
-    print(path.item.cost)
+    size = paths_queue.qsize()
+    for i in range (0, size):    
+        path = paths_queue.get()
+        print(path.item.cost)
+
+    
+    
     
 
 
