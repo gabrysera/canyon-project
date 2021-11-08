@@ -1,4 +1,6 @@
 import math
+from queue import PriorityQueue
+
 
 class Pillar(object):
     """ x and y coordinates for each pillar object has its  (for its placement on the graph). """
@@ -13,6 +15,17 @@ class Pillar(object):
         """ this function can be used to add a reachable pillar object p to the dictionary of nodes accesible to the main pillar object, 
         and the distance associated to reach it. """
         self.dict[p] = possible_disks
+
+class Path(object):
+    
+    def __init__(self, starting_pillar, cost):
+        self.starting_pillar = starting_pillar
+        self.cost = cost
+        self.pillars = [starting_pillar]
+
+    def add_pillar(self, pillar, cost):
+        self.pillars.append(pillar)
+        self.cost += cost
 
 def distance(p1,p2): 
     """ given two points, this function returns the (Pythogorean) distance between the two Pillar objects."""
@@ -111,6 +124,8 @@ def divide_pillars(pillars):
             not_start_pillars.append(p)
     return (start_pillars, not_start_pillars)
     
+def search (divided_pillars):
+
 
 def search_path(W, pillars):
     """search the most expensive path in the graph
@@ -119,6 +134,8 @@ def search_path(W, pillars):
         W (Int): canyon goal
     """
     divided_pillars = divide_pillars(pillars)
+    search(divided_pillars)
+
 
 def main():
     """main function of the project, read the input, prepare the canyon graph and search the graph
