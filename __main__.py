@@ -1,6 +1,4 @@
 import math
-from queue import PriorityQueue
-
 
 class Pillar(object):
     """ x and y coordinates for each pillar object has its  (for its placement on the graph). """
@@ -75,8 +73,7 @@ def create_adjacency_matrix(W, pillars, disks_pairs, max_r, disks):
             starting_pillars.append(p)
         else:
             not_starting_pillars.append(p)
-        start_index += 1
-        #reachable = 
+        start_index += 1   
         reachable_pillars(p, pillars[start_index:], 2*max_r, disks_pairs) #instead of using max_r can we not use dist bbetween the points as threshold directly
         return (starting_pillars, not_starting_pillars)
 
@@ -107,10 +104,10 @@ def create_graph(W, pillars, disks):
         items = p.dict.items()
         print("nodes reachable from here: \n")
         for i in items:
-            print(i[0].x,i[0].y,i[1]) #i[9] is the pillar object (the key value) and i[1] are the possible disc pairs
+            print(i[0].x,i[0].y,i[1]) 
             print("\n")
         print("\n")
-
+    return divided_pillars
 
 def read_input(): 
     """read the standard input and store pillars using pillar class, and then group them in a list, 
@@ -151,7 +148,7 @@ def divide_pillars(pillars):
 
 def search (divided_pillars, disks):
     queue = []
-    for p in divided_pillars[0]:
+    for p in divided_pillars[1]:
         queue.append(p)
     
 
