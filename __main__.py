@@ -96,7 +96,7 @@ def create_graph(W, pillars, disks):
     disks = sorted(disks)
     max_r = disks[-1][0]
     disks_pairs = sorted(disks_combinations(disks), key=lambda x: x[2], reverse=True) #here x[2] is the total size of both discs
-    divided_pillars = create_adjacency_matrix(W, pillars, disks_pairs, max_r, disks)
+    divided_pillars = create_adjacency_matrix(W, pillars, disks_pairs, max_r, disks)#note: this functions returns two lists, not one, but i believe the second one is being ignored here
     for p in pillars:
         print(p.x,p.y)
         items = p.dict.items()
@@ -127,6 +127,14 @@ def read_input():
     return (y_goal, pillars, disks)
 
 def divide_pillars(pillars):
+    """[summary]
+
+    Args:
+        pillars ([type]): [description]
+
+    Returns:
+        [type]: [description]
+    """
     start_pillars = []
     not_start_pillars = []
     for p in pillars:
@@ -144,13 +152,12 @@ def search (divided_pillars, disks):
 
 
 def search_path(W, pillars, disks):
-    """search the most expensive path in the graph
+    """search the least expensive path in the graph
 
     Args:
         W (Int): canyon goal
     """
-
-    divided_pillars = divide_pillars(pillars)
+    divided_pillars = divide_pillars(pillars) #the function returns two, not one list, but i believe the second one is being ignored here
     search(divided_pillars, disks)
 
 
