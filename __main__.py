@@ -142,16 +142,7 @@ def search (starting_pillars, disks, pillars):
         path = Path(p)
         print(path)
         paths_queue.put(PrioritizedItem(path.cost, path))
-
-    size = paths_queue.qsize()
-    for i in range (0, size):    
-        path = paths_queue.get()
-        print(path.item.cost)
-
-    
-    
-    
-
+    #now run dijkstra
 
 def search_path(W, starting_pillars, disks, pillars):
     """search the least expensive path in the graph
