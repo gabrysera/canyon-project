@@ -6,6 +6,7 @@ class Pillar(object):
     def __init__(self, x, y):  
         self.x = x
         self.y = y
+        self.start = False
         self.dict = {}
 
     def set_reachable_node(self, p, possible_disks): 
@@ -43,6 +44,8 @@ def create_adjacency_matrix(W, pillars, disks_pairs, max_r):
     values including a nested dictionary of the nodes accessible to it and the cost to access it. """
     start_index = 0
     for p in pillars:
+        if p.y <= max_r:
+            p.start = True
         start_index += 1
         #reachable = 
         reachable_pillars(p, pillars[start_index:], 2*max_r, disks_pairs) #instead of using max_r can we not use dist bbetween the points as threshold directly
@@ -55,11 +58,15 @@ def disks_combinations(disks):
     return combinations
 
 def create_graph(W, pillars, disks): 
-    """ this function sorts the disks with increasing size and chooses the biggest disc size available as the maximum size to pass 
-    as the threshold to the function for creating the adjacency matrix. """
-    #store pillars optimal distances
-    #only store distances, and then while you run the search you add cost depending on the actual disk
-    #after a path is found, optimizie it (checks if you can reduce cost) 
+    """this function is used to create the graph of the canyo, in order to do that, for every pillar it will compute 
+    the distance with the others pillars and for the reachable ones it will add the possible pairs of pillars to use 
+    to reach that pillar with the reolated cost.
+    It will also determine for each pillar if its a starting pillar or not.
+    Args:
+        W (Int): max y value on the canyon.
+        pillars ([pillar]): pillars of the canyon
+        disks ([(Int,Int)]): list of available disks, the tuple contains the radius and the cost respectively
+    """
     disks = sorted(disks)
     max_r = disks[-1][0]
     disks_pairs = sorted(disks_combinations(disks), key=lambda x: x[2], reverse=True) #here x[2] is the total size of both discs
@@ -72,11 +79,14 @@ def create_graph(W, pillars, disks):
             print(i[0].x,i[0].y,i[1])
             print("\n")
         print("\n")
-    return 
+
 
 def read_input(): 
-    """ this function reads the input and stores them into variables and appends others as tuples to lists to be later used in 
-    creating a graph representation and running the Dijstra's algorithm on it. """
+    """read the standard input and store pillars using pillar class, and then group them in a list, 
+        save also the possible disks with their properties (radius, cost) in a list and store W value of the canyon.
+    Returns:
+        [type]: [description]
+    """
     number_of_pillars,m_kind_of_disks,y_goal = list(map(int, input().split()))
     pillars = []
     disks = []
@@ -91,6 +101,8 @@ def read_input():
     return (y_goal, pillars, disks)
 
 def main():
+    """main function of the project, read the input, prepare the canyon graph and search the graph
+    """
     (W, pillars, disks) = read_input()
     create_graph(W, pillars, disks)
 
