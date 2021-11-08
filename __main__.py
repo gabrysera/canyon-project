@@ -67,6 +67,7 @@ def create_graph(W, pillars, disks):
         pillars ([pillar]): pillars of the canyon
         disks ([(Int,Int)]): list of available disks, the tuple contains the radius and the cost respectively
     """
+    
     disks = sorted(disks)
     max_r = disks[-1][0]
     disks_pairs = sorted(disks_combinations(disks), key=lambda x: x[2], reverse=True) #here x[2] is the total size of both discs
@@ -100,11 +101,31 @@ def read_input():
 
     return (y_goal, pillars, disks)
 
+def divide_pillars(pillars):
+    start_pillars = []
+    not_start_pillars = []
+    for p in pillars:
+        if p.start:
+            start_pillars.append(p)
+        else:
+            not_start_pillars.append(p)
+    return (start_pillars, not_start_pillars)
+    
+
+def search_path(W, pillars):
+    """search the most expensive path in the graph
+
+    Args:
+        W (Int): canyon goal
+    """
+    divided_pillars = divide_pillars(pillars)
+
 def main():
     """main function of the project, read the input, prepare the canyon graph and search the graph
     """
     (W, pillars, disks) = read_input()
     create_graph(W, pillars, disks)
+    search_path(W,pillars)
 
 if __name__ == "__main__":
     main()
