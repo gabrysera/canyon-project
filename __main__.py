@@ -15,7 +15,7 @@ class Pillar(object):
         """ this function can be used to add a reachable pillar object p to the dictionary of nodes accesible to the main pillar object, 
         and the distance associated to reach it. """
         self.dict[p] = possible_disks
-        
+
     def set_start_disk(self, start_disk):
         self.start_disk = start_disk
 
@@ -55,14 +55,21 @@ def reachable_pillars(p, pillars, threshold, disks_pairs):
             p.set_reachable_node(p0, p_p0_pairs)
     #return res #self note: instead of appending to res and returning, what if we dont append to it and return that
 
-def create_adjacency_matrix(W, pillars, disks_pairs, max_r): 
+def cheaper_disk(disks, pillar):
+    for disk in disks:
+        if disk[0] >= pillar.y:
+            if disk[1] < cheaper:
+                cheaper = disk
+    return cheaper
+
+def create_adjacency_matrix(W, pillars, disks_pairs, max_r, disks): 
     """ this function creates the adjacency list by using dictionaries with each pillar object as key and its 
     values including a nested dictionary of the nodes accessible to it and the cost to access it. """
     start_index = 0
     for p in pillars:
         if p.y <= max_r:
             p.start = True
-
+            p.start_disk = cheaper_disk(disks, p)
         start_index += 1
         #reachable = 
         reachable_pillars(p, pillars[start_index:], 2*max_r, disks_pairs) #instead of using max_r can we not use dist bbetween the points as threshold directly
@@ -88,7 +95,7 @@ def create_graph(W, pillars, disks):
     disks = sorted(disks)
     max_r = disks[-1][0]
     disks_pairs = sorted(disks_combinations(disks), key=lambda x: x[2], reverse=True) #here x[2] is the total size of both discs
-    create_adjacency_matrix(W, pillars, disks_pairs, max_r)
+    create_adjacency_matrix(W, pillars, disks_pairs, max_r, disks)
     for p in pillars:
         print(p.x,p.y)
         items = p.dict.items()
@@ -127,20 +134,20 @@ def divide_pillars(pillars):
         else:
             not_start_pillars.append(p)
     return (start_pillars, not_start_pillars)
-    
-def search (divided_pillars):
+
+def search (divided_pillars, disks):
     paths = []
     for p in divided_pillars[0]:
         paths.append(Path(p,))
 
-def search_path(W, pillars):
+def search_path(W, pillars, disks):
     """search the most expensive path in the graph
 
     Args:
         W (Int): canyon goal
     """
     divided_pillars = divide_pillars(pillars)
-    search(divided_pillars)
+    search(divided_pillars, disks)
 
 
 def main():
@@ -148,7 +155,7 @@ def main():
     """
     (W, pillars, disks) = read_input()
     create_graph(W, pillars, disks)
-    search_path(W,pillars)
+    search_path(W,pillars, disks)
 
 if __name__ == "__main__":
     main()
