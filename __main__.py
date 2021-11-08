@@ -139,6 +139,7 @@ def search (divided_pillars, disks):
     paths = []
     for p in divided_pillars[0]:
         paths.append(Path(p))
+    
 
 def search_path(W, pillars, disks):
     """search the most expensive path in the graph
