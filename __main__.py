@@ -47,7 +47,7 @@ def reachable_pillars(p, pillars, threshold, disks_pairs):
     the biggest sized disc available(threshold), then its added as a reachable node to both """
     for p0 in pillars:
         dist = distance(p0, p)
-        if dist <= threshold: #instead of using threshold can be directly using dist?
+        if dist <= threshold: #instead of using threshold can be directly using dist? I dont think so because we are using distance to see if they are reachable with the bigger disk
             p_p0_pairs = possible_disks(dist, disks_pairs)
             p0.set_reachable_node(p, p_p0_pairs)
             p.set_reachable_node(p0, p_p0_pairs)
