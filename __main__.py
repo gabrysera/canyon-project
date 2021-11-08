@@ -15,6 +15,9 @@ class Pillar(object):
         """ this function can be used to add a reachable pillar object p to the dictionary of nodes accesible to the main pillar object, 
         and the distance associated to reach it. """
         self.dict[p] = possible_disks
+        
+    def set_start_disk(self, start_disk):
+        self.start_disk = start_disk
 
 class Path(object):
     
@@ -59,6 +62,7 @@ def create_adjacency_matrix(W, pillars, disks_pairs, max_r):
     for p in pillars:
         if p.y <= max_r:
             p.start = True
+
         start_index += 1
         #reachable = 
         reachable_pillars(p, pillars[start_index:], 2*max_r, disks_pairs) #instead of using max_r can we not use dist bbetween the points as threshold directly
@@ -125,7 +129,9 @@ def divide_pillars(pillars):
     return (start_pillars, not_start_pillars)
     
 def search (divided_pillars):
-
+    paths = []
+    for p in divided_pillars[0]:
+        paths.append(Path(p,))
 
 def search_path(W, pillars):
     """search the most expensive path in the graph
