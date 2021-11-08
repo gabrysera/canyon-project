@@ -21,9 +21,9 @@ class Pillar(object):
 
 class Path(object):
     
-    def __init__(self, starting_pillar, cost):
+    def __init__(self, starting_pillar):
         self.starting_pillar = starting_pillar
-        self.cost = cost
+        self.cost = starting_pillar.start_disk[1]
         self.pillars = [starting_pillar]
 
     def add_pillar(self, pillar, cost):
@@ -138,7 +138,7 @@ def divide_pillars(pillars):
 def search (divided_pillars, disks):
     paths = []
     for p in divided_pillars[0]:
-        paths.append(Path(p,))
+        paths.append(Path(p))
 
 def search_path(W, pillars, disks):
     """search the most expensive path in the graph
