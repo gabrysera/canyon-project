@@ -56,23 +56,29 @@ def reachable_pillars(p, pillars, threshold, disks_pairs):
     #return res #self note: instead of appending to res and returning, what if we dont append to it and return that
 
 def cheaper_disk(disks, pillar):
+    res = []
     for disk in disks:
         if disk[0] >= pillar.y:
-            if disk[1] < cheaper:
-                cheaper = disk
-    return cheaper
+            res.append(disk)
+    return min(res, key = lambda t: t[1])
 
 def create_adjacency_matrix(W, pillars, disks_pairs, max_r, disks): 
     """ this function creates the adjacency list by using dictionaries with each pillar object as key and its 
     values including a nested dictionary of the nodes accessible to it and the cost to access it. """
     start_index = 0
+    starting_pillars = []
+    not_starting_pillars = []
     for p in pillars:
         if p.y <= max_r:
             p.start = True
             p.start_disk = cheaper_disk(disks, p)
+            starting_pillars.append(p)
+        else:
+            not_starting_pillars.append(p)
         start_index += 1
         #reachable = 
         reachable_pillars(p, pillars[start_index:], 2*max_r, disks_pairs) #instead of using max_r can we not use dist bbetween the points as threshold directly
+        return (starting_pillars, not_starting_pillars)
 
 def disks_combinations(disks):
     combinations = []
@@ -95,7 +101,7 @@ def create_graph(W, pillars, disks):
     disks = sorted(disks)
     max_r = disks[-1][0]
     disks_pairs = sorted(disks_combinations(disks), key=lambda x: x[2], reverse=True) #here x[2] is the total size of both discs
-    create_adjacency_matrix(W, pillars, disks_pairs, max_r, disks)
+    divided_pillars = create_adjacency_matrix(W, pillars, disks_pairs, max_r, disks)
     for p in pillars:
         print(p.x,p.y)
         items = p.dict.items()
@@ -136,9 +142,9 @@ def divide_pillars(pillars):
     return (start_pillars, not_start_pillars)
 
 def search (divided_pillars, disks):
-    queue = PriorityQueue()
+    queue = []
     for p in divided_pillars[0]:
-        queue.put(p)
+        queue.append(p)
     
 
 
