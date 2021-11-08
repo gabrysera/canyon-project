@@ -78,7 +78,7 @@ def disks_combinations(disks):
     combinations = []
     for d in disks:
         for d1 in disks:
-            combinations.append((d[0],d1[0],d[0]+d1[0],d[1]+d1[1])) #size of one disc, size of other disk, total size, total cost
+            combinations.append((d[0],d1[0],d[0]+d1[0],d[1]+d1[1])) #disc pairs = size of one disc, size of other disk, total size, total cost
     return combinations
 
 def create_graph(W, pillars, disks): 
@@ -101,7 +101,7 @@ def create_graph(W, pillars, disks):
         items = p.dict.items()
         print("nodes reachable from here: \n")
         for i in items:
-            print(i[0].x,i[0].y,i[1])
+            print(i[0].x,i[0].y,i[1]) #i[9] is the pillar object (the key value) and i[1] are the possible disc pairs
             print("\n")
         print("\n")
 
