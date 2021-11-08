@@ -138,11 +138,13 @@ def search (starting_pillars, disks, pillars):
 
     paths_queue = PriorityQueue()
     for p in starting_pillars:
-        print('uno')
         path = Path(p)
-        print(path)
         paths_queue.put(PrioritizedItem(path.cost, path))
-    #now run dijkstra
+    #now run dijkstra modified such that every time it checks if previous disk can be changed, if so checks 
+    #for previous of that as well and so on.
+    #from the path you add all the path with the cheapest connection we have from that disk to the others, and
+    #for each new disk add new path in the queue with cost, once a solution is found, record results and cut out
+    #branch that already have a lower cost.
 
 def search_path(W, starting_pillars, disks, pillars):
     """search the least expensive path in the graph
