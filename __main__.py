@@ -14,8 +14,7 @@ class Pillar(object):
         and the distance associated to reach it. """
         self.dict[p] = possible_disks
 
-    def set_start_disk(self, start_disk):
-        self.start_disk = start_disk
+    
 
 class Path(object):
     
@@ -69,13 +68,12 @@ def create_adjacency_matrix(W, pillars, disks_pairs, max_r, disks):
     for p in pillars:
         if p.y <= max_r:
             p.start = True
-            p.start_disk = cheaper_disk(disks, p)
             starting_pillars.append(p)
         else:
             not_starting_pillars.append(p)
         start_index += 1   
         reachable_pillars(p, pillars[start_index:], 2*max_r, disks_pairs) #instead of using max_r can we not use dist bbetween the points as threshold directly
-        return (starting_pillars, not_starting_pillars)
+    return (starting_pillars, not_starting_pillars)
 
 def disks_combinations(disks):
     combinations = []
