@@ -1,4 +1,7 @@
 import math
+from dataclasses import dataclass, field
+from queue import PriorityQueue
+from typing import Any
 
 class Pillar(object):
     """ x and y coordinates for each pillar object has its  (for its placement on the graph). """
@@ -21,7 +24,7 @@ class Path(object):
     
     def __init__(self, starting_pillar):
         self.starting_pillar = starting_pillar
-        self.cost = starting_pillar.start_disk[1]
+        self.cost = starting_pillar.starting_disk[1]
         self.pillars = [starting_pillar]
 
     def add_pillar(self, pillar, cost):
@@ -127,18 +130,31 @@ def read_input():
     return (y_goal, pillars, disks)
 
 def search (starting_pillars, disks, pillars):
-    starting_queue = []
+
+    @dataclass(order=True)
+    class PrioritizedItem:
+        priority: int
+        item: Any=field(compare=False)
+
+    paths_queue = PriorityQueue()
     for p in starting_pillars:
-        starting_queue.append(p)
+        path = Path(p)
+        print(path)
+        paths_queue.put(PrioritizedItem(path.cost, path))
+
+    print(paths_queue.qsize())
+    path = paths_queue.get()
+    print(path.item.cost)
+    
 
 
-def search_path(W, starting_pillars, disks):
+def search_path(W, starting_pillars, disks, pillars):
     """search the least expensive path in the graph
 
     Args:
         W (Int): canyon goal
     """
-    search(starting_pillars, disks)
+    search(starting_pillars, disks, pillars)
 
 
 def main():
