@@ -145,6 +145,7 @@ def search (starting_pillars, disks, pillars):
     #from the path you add all the path with the cheapest connection we have from that disk to the others, and
     #for each new disk add new path in the queue with cost, once a solution is found, record results and cut out
     #branch that already have a lower cost.
+    #for every node keep track of max cost until now so that we can prune branches.
 
 def search_path(W, starting_pillars, disks, pillars):
     """search the least expensive path in the graph
