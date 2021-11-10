@@ -18,9 +18,9 @@ class Pillar(object):
         and the distance associated to reach it. """
         self.dict[p] = possible_disks
 
-    def set_starting_disk(self, disk):
-        self.starting_disk = disk
-        self.cost = disk[1]
+    def set_starting_disk(self, disk):#CHANGE NAME TO SET_DISK
+        self.disk = [disk]
+        self.cost = self.disk[0][1]
 
     def set_disk_path_cost(self, cost):
         self.cost = cost
@@ -57,8 +57,12 @@ def reachable_pillars(p, pillars, threshold, disks_pairs):
         dist = distance(p0, p)
         if dist <= threshold: #instead of using threshold can be directly using dist? I dont think so because we are using distance to see if they are reachable with the bigger disk
             p_p0_pairs = possible_disks(dist, disks_pairs)
+            #CHANGE: FOR LOOP
+            p0_p_pairs =  []
+            for pair in p_p0_pairs:
+                p0_p_pairs.append((pair[1], pair[0], pair[2], pair[3], pair[5], pair[4]))
             p0.set_reachable_node(p, p_p0_pairs)
-            p.set_reachable_node(p0, p_p0_pairs)
+            p.set_reachable_node(p0,  p0_p_pairs)
     #return res #self note: instead of appending to res and returning, what if we dont append to it and return that
 
 def cheaper_disk(disks, pillar):
@@ -151,22 +155,31 @@ def search (starting_pillars, disks, pillars):
     for p in starting_pillars:
         path = Path([p])
         paths_queue.put(PrioritizedItem(path.cost, path))
-    while(not paths_queue.empty()):
-        path = paths_queue.get()
-        for reachable_pillar in path.item.pillars[-1].dict.items():
-            print(reachable_pillar[0].x, reachable_pillar[0].visited, reachable_pillar[1])
-            new_cost = path.item.cost + reachable_pillar[1][0][5] #wrong, first check for our disk size. maybe we can use dictionary to access cheaper disk given the size
-            if reachable_pillar[0].visited:
-                if reachable_pillar[0].cost > new_cost:
-                    path.item.pillars.append(reachable_pillar[0])
-                    new_path = Path(path.item.pillars)
-                    paths_queue.put(PrioritizedItem(new_cost, new_path))
-            else:
-                reachable_pillar[0].visited = True
-                reachable_pillar[0].set_disk_path_cost(new_cost)#wrong, first chech last disk size
+    #while(not paths_queue.empty()):
+    path = paths_queue.get()
+    for reachable_pillar in path.item.pillars[-1].dict.items():
+        new_size = 0
+        index = 0
+        while (path.item.pillars[-1].disk[0][0] > new_size and index < len(reachable_pillar[1])): #size
+            new_size = reachable_pillar[1][index][1]
+            index += 1
+        index -= 1
+        print(path.item.pillars[-1].x ,path.item.pillars[-1].y)
+        print(reachable_pillar[0].x, reachable_pillar[0].y, reachable_pillar[0].visited, reachable_pillar[1][index][5], reachable_pillar[1][index][4])
+        new_cost = path.item.cost + reachable_pillar[1][index][5] + (reachable_pillar[1][index][4] - path.item.pillars[-1].cost) #wrong, first check for our disk size. maybe we can use dictionary to access cheaper disk given the size
+        if reachable_pillar[0].visited:
+            if reachable_pillar[0].cost > new_cost:
                 path.item.pillars.append(reachable_pillar[0])
                 new_path = Path(path.item.pillars)
+                
+                reachable_pillar[0].set_starting_disk((reachable_pillar[1][0][2] ,reachable_pillar[1][0][5]))
                 paths_queue.put(PrioritizedItem(new_cost, new_path))
+        else:
+            reachable_pillar[0].visited = True
+            reachable_pillar[0].set_starting_disk((reachable_pillar[1][index][2] ,reachable_pillar[1][index][5]))
+            path.item.pillars.append(reachable_pillar[0])
+            new_path = Path(path.item.pillars)
+            paths_queue.put(PrioritizedItem(new_cost, new_path))
 
     #now run dijkstra modified such that every time it checks if previous disk can be changed, if so checks 
     #for previous of that as well and so on.
