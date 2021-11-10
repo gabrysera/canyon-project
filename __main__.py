@@ -11,6 +11,7 @@ class Pillar(object):
         self.y = y
         self.start = False
         self.dict = {}
+        self.visited = False
 
     def set_reachable_node(self, p, possible_disks): 
         """ this function can be used to add a reachable pillar object p to the dictionary of nodes accesible to the main pillar object, 
@@ -19,13 +20,17 @@ class Pillar(object):
 
     def set_starting_disk(self, disk):
         self.starting_disk = disk
+        self.cost = disk[1]
+
+    def set_disk_path_cost(self, cost):
+        self.cost = cost
 
 class Path(object):
     
-    def __init__(self, starting_pillar):
-        self.starting_pillar = starting_pillar
-        self.cost = starting_pillar.starting_disk[1]
-        self.pillars = [starting_pillar]
+    def __init__(self, pillars):
+        #self.starting_pillar = starting_pillar
+        self.cost = pillars[-1].cost
+        self.pillars = pillars
 
     def add_pillar(self, pillar, cost):
         self.pillars.append(pillar)
@@ -72,6 +77,7 @@ def create_adjacency_matrix(W, pillars, disks_pairs, max_r, disks):
         if p.y <= max_r:
             p.start = True
             p.set_starting_disk(cheaper_disk(disks, p))
+            p.visited = True
             starting_pillars.append(p)
 
         start_index += 1   
@@ -82,7 +88,7 @@ def disks_combinations(disks):
     combinations = []
     for d in disks:
         for d1 in disks:
-            combinations.append((d[0],d1[0],d[0]+d1[0],d[1]+d1[1])) #disc pairs = size of one disc, size of other disk, total size, total cost
+            combinations.append((d[0],d1[0],d[0]+d1[0],d[1]+d1[1],d[1],d1[1])) #disc pairs = size of one disc, size of other disk, total size, total cost
     return combinations
 
 def create_graph(W, pillars, disks): 
@@ -100,6 +106,7 @@ def create_graph(W, pillars, disks):
     max_r = disks[-1][0]
     disks_pairs = sorted(disks_combinations(disks), key=lambda x: x[2], reverse=True) #here x[2] is the total size of both discs
     starting_pillars = create_adjacency_matrix(W, pillars, disks_pairs, max_r, disks)#note: this functions returns two lists, not one, but i believe the second one is being ignored here
+    """ 
     for p in pillars:
         print(p.x,p.y)
         items = p.dict.items()
@@ -108,6 +115,7 @@ def create_graph(W, pillars, disks):
             print(i[0].x,i[0].y,i[1]) 
             print("\n")
         print("\n")
+    """
     return starting_pillars
 
 def read_input(): 
@@ -129,6 +137,9 @@ def read_input():
 
     return (y_goal, pillars, disks)
 
+def take_cheapest_disk():
+    return
+
 def search (starting_pillars, disks, pillars):
 
     @dataclass(order=True)
@@ -138,8 +149,25 @@ def search (starting_pillars, disks, pillars):
 
     paths_queue = PriorityQueue()
     for p in starting_pillars:
-        path = Path(p)
+        path = Path([p])
         paths_queue.put(PrioritizedItem(path.cost, path))
+    while(not paths_queue.empty()):
+        path = paths_queue.get()
+        for reachable_pillar in path.item.pillars[-1].dict.items():
+            print(reachable_pillar[0].x, reachable_pillar[0].visited, reachable_pillar[1])
+            new_cost = path.item.cost + reachable_pillar[1][0][5] #wrong, first check for our disk size. maybe we can use dictionary to access cheaper disk given the size
+            if reachable_pillar[0].visited:
+                if reachable_pillar[0].cost > new_cost:
+                    path.item.pillars.append(reachable_pillar[0])
+                    new_path = Path(path.item.pillars)
+                    paths_queue.put(PrioritizedItem(new_cost, new_path))
+            else:
+                reachable_pillar[0].visited = True
+                reachable_pillar[0].set_disk_path_cost(new_cost)#wrong, first chech last disk size
+                path.item.pillars.append(reachable_pillar[0])
+                new_path = Path(path.item.pillars)
+                paths_queue.put(PrioritizedItem(new_cost, new_path))
+
     #now run dijkstra modified such that every time it checks if previous disk can be changed, if so checks 
     #for previous of that as well and so on.
     #from the path you add all the path with the cheapest connection we have from that disk to the others, and
