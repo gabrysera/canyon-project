@@ -22,9 +22,9 @@ class Pillar(object):
         self.disk = [disk]
         self.cost = self.disk[0][1]
 
-    def set_disk_path_cost(self, cost):
-        self.cost = cost
-
+    def set_path_cost(self, cost):
+        self.cost_path = cost
+"""
 class Path(object):
     
     def __init__(self, pillars):
@@ -32,9 +32,10 @@ class Path(object):
         self.cost = pillars[-1].cost
         self.pillars = pillars
 
-    def add_pillar(self, pillar, cost):
-        self.pillars.append(pillar)
-        self.cost += cost
+    def get_pillars(self):
+        return self.pillars
+"""
+
 
 def distance(p1,p2): 
     """ given two points, this function returns the (Pythogorean) distance between the two Pillar objects."""
@@ -81,6 +82,7 @@ def create_adjacency_matrix(W, pillars, disks_pairs, max_r, disks):
         if p.y <= max_r:
             p.start = True
             p.set_starting_disk(cheaper_disk(disks, p))
+            p.set_path_cost(p.disk[0][1])
             p.visited = True
             starting_pillars.append(p)
 
@@ -144,42 +146,79 @@ def read_input():
 def take_cheapest_disk():
     return
 
-def search (starting_pillars, disks, pillars):
+def search (starting_pillars, W):
 
     @dataclass(order=True)
     class PrioritizedItem:
         priority: int
         item: Any=field(compare=False)
-
+    
     paths_queue = PriorityQueue()
     for p in starting_pillars:
-        path = Path([p])
-        paths_queue.put(PrioritizedItem(path.cost, path))
-    #while(not paths_queue.empty()):
+        paths_queue.put(PrioritizedItem(p.cost, p))
+
+    final_value = 1000000000
+    while(not paths_queue.empty()):
+        now_pillar = paths_queue.get().item
+        for adjacent_pillar in now_pillar.dict.items():
+            #print("pillar: " ,now_pillar.x, now_pillar.y)
+            #print("adjacent pillar: ", adjacent_pillar[0].x, adjacent_pillar[0].y)
+            #print(now_pillar.dict[adjacent_pillar[0]][0][4])
+            new_cost = now_pillar.cost_path + adjacent_pillar[0].dict[now_pillar][0][4] + (now_pillar.dict[adjacent_pillar[0]][0][4] - now_pillar.disk[0][1]) #wrong, first check for our disk size. maybe we can use dictionary to access cheaper disk given the size
+            #print("new path cost: ", new_cost)
+            if adjacent_pillar[0].visited:
+                if new_cost < adjacent_pillar[0].cost_path:
+                    print("pillar: " ,now_pillar.x, now_pillar.y)
+                    print("adjacent pillar: ", adjacent_pillar[0].x, adjacent_pillar[0].y)
+                    print("changing cost: ",new_cost, adjacent_pillar[0].cost_path)
+                    adjacent_pillar[0].set_starting_disk((adjacent_pillar[0].dict[now_pillar][0][0] , adjacent_pillar[0].dict[now_pillar][0][4]))#something wrong here
+                    adjacent_pillar[0].set_path_cost(new_cost)
+                    paths_queue.put(PrioritizedItem(new_cost, adjacent_pillar[0]))
+            else:
+                adjacent_pillar[0].visited = True
+                adjacent_pillar[0].set_starting_disk((adjacent_pillar[0].dict[now_pillar][0][0] , adjacent_pillar[0].dict[now_pillar][0][4]))
+                adjacent_pillar[0].set_path_cost(new_cost)
+                paths_queue.put(PrioritizedItem(new_cost, adjacent_pillar[0]))
+
+        if adjacent_pillar[0].y + adjacent_pillar[0].disk[0][0] >= W:
+            if adjacent_pillar[0].cost_path < final_value:
+                final_value = adjacent_pillar[0].cost_path
+    print(final_value)
+    """
     path = paths_queue.get()
-    for reachable_pillar in path.item.pillars[-1].dict.items():
+    dijkstra_pillars = path.item.pillars[-1].dict.items()
+    for reachable_pillar in dijkstra_pillars:
+        print(path.item.pillars)
         new_size = 0
         index = 0
-        while (path.item.pillars[-1].disk[0][0] > new_size and index < len(reachable_pillar[1])): #size
+        print("pillar: ",path.item.pillars[-1].x ,path.item.pillars[-1].y)
+        print("pillar size: ",path.item.pillars[-1].disk[0][0])
+        while (path.item.pillars[-1].disk[0][0] > new_size): #size
+            
             new_size = reachable_pillar[1][index][1]
+            #print("pillar size: ",path.item.pillars[-1].disk[0][0])
+            print("new pillar: ",reachable_pillar[1][index])
+            print("new pillar size: ",reachable_pillar[1][index][1])
             index += 1
         index -= 1
-        print(path.item.pillars[-1].x ,path.item.pillars[-1].y)
+        
         print(reachable_pillar[0].x, reachable_pillar[0].y, reachable_pillar[0].visited, reachable_pillar[1][index][5], reachable_pillar[1][index][4])
         new_cost = path.item.cost + reachable_pillar[1][index][5] + (reachable_pillar[1][index][4] - path.item.pillars[-1].cost) #wrong, first check for our disk size. maybe we can use dictionary to access cheaper disk given the size
         if reachable_pillar[0].visited:
             if reachable_pillar[0].cost > new_cost:
                 path.item.pillars.append(reachable_pillar[0])
-                new_path = Path(path.item.pillars)
-                
+                new_path = Path(path)
                 reachable_pillar[0].set_starting_disk((reachable_pillar[1][0][2] ,reachable_pillar[1][0][5]))
                 paths_queue.put(PrioritizedItem(new_cost, new_path))
         else:
             reachable_pillar[0].visited = True
             reachable_pillar[0].set_starting_disk((reachable_pillar[1][index][2] ,reachable_pillar[1][index][5]))
             path.item.pillars.append(reachable_pillar[0])
-            new_path = Path(path.item.pillars)
+            print("path: ",path.item.pillars)
+            new_path = Path(path)
             paths_queue.put(PrioritizedItem(new_cost, new_path))
+    """
+    
 
     #now run dijkstra modified such that every time it checks if previous disk can be changed, if so checks 
     #for previous of that as well and so on.
@@ -188,13 +227,13 @@ def search (starting_pillars, disks, pillars):
     #branch that already have a lower cost.
     #for every node keep track of max cost until now so that we can prune branches.
 
-def search_path(W, starting_pillars, disks, pillars):
+def search_path(W, starting_pillars):
     """search the least expensive path in the graph
 
     Args:
         W (Int): canyon goal
     """
-    search(starting_pillars, disks, pillars)
+    search(starting_pillars, W)
 
 
 def main():
@@ -202,7 +241,7 @@ def main():
     """
     (W, pillars, disks) = read_input()
     starting_pillars = create_graph(W, pillars, disks)
-    search_path(W, starting_pillars, disks, pillars)
+    search_path(W, starting_pillars)
 
 if __name__ == "__main__":
     main()
