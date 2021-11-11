@@ -202,14 +202,6 @@ def search (starting_pillars, W):
             if adjacent_pillar[0].cost_path < final_value:
                 final_value = adjacent_pillar[0].cost_path
     print(final_value)
-    
-
-    #now run dijkstra modified such that every time it checks if previous disk can be changed, if so checks 
-    #for previous of that as well and so on.
-    #from the path you add all the path with the cheapest connection we have from that disk to the others, and
-    #for each new disk add new path in the queue with cost, once a solution is found, record results and cut out
-    #branch that already have a lower cost.
-    #for every node keep track of max cost until now so that we can prune branches.
 
 def search_path(W, starting_pillars):
     """search the least expensive path in the graph
