@@ -92,16 +92,20 @@ def create_adjacency_matrix(W, pillars, disks_pairs, max_r, disks):
     values including a nested dictionary of the nodes accessible to it and the cost to access it. """
     start_index = 0
     starting_pillars = []
+    finish = False
     for p in pillars:
         if p.y <= max_r:
             p.set_starting_disk(cheaper_disk(disks, p))
             p.set_path_cost(p.disk[0][1])
             starting_pillars.append(p)
-            print("start")
         if p.y + max_r >= W:
             p.set_end_disk(disk_to_the_end(disks, p.y, W))
+            finish = True
         start_index += 1   
         reachable_pillars(p, pillars[start_index:], 2*max_r, disks_pairs) #instead of using max_r can we not use dist bbetween the points as threshold directly
+    if not finish:
+        print('impossible')
+        return []
     return starting_pillars
 
 def disks_combinations(disks):
@@ -124,7 +128,8 @@ def create_graph(W, pillars, disks):
     
     disks = sorted(disks)
     max_r = disks[-1][0]
-    disks_pairs = sorted(disks_combinations(disks), key=lambda x: x[2], reverse=True) #here x[2] is the total size of both discs
+    disks = sorted(disks, key = lambda x: x[1])
+    disks_pairs = sorted(disks_combinations(disks), key=lambda x: x[3]) #here x[2] is the total size of both discs
     starting_pillars = create_adjacency_matrix(W, pillars, disks_pairs, max_r, disks)#note: this functions returns two lists, not one, but i believe the second one is being ignored here
     return starting_pillars
 
@@ -167,14 +172,11 @@ def search (starting_pillars, W):
     paths_queue = PriorityQueue()
     for p in starting_pillars:
         paths_queue.put(PrioritizedItem(p.cost, p))
-    print(paths_queue.qsize())
     final_value = 100000000000000000000
     while(not paths_queue.empty()):
         now_pillar = paths_queue.get().item
-        print(now_pillar.x,len(now_pillar.dict.items()),paths_queue.qsize())
         if now_pillar.reach_end:
             value = now_pillar.cost_path - now_pillar.cost + now_pillar.end_disk[1]
-            print("reacg end!! : ", value)
             if value < final_value:
                 final_value = value
         for adjacent_pillar in now_pillar.dict.items():
