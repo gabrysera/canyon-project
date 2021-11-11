@@ -12,6 +12,7 @@ class Pillar(object):
         self.start = False
         self.dict = {}
         self.visited = False
+        self.disk = [(0,0)]
 
     def set_reachable_node(self, p, possible_disks): 
         """ this function can be used to add a reachable pillar object p to the dictionary of nodes accesible to the main pillar object, 
@@ -19,7 +20,7 @@ class Pillar(object):
         self.dict[p] = (possible_disks)
 
     def set_starting_disk(self, disk):#CHANGE NAME TO SET_DISK
-        self.disk = [disk]
+        self.disk[0] = disk
         self.cost = self.disk[0][1]
 
     def set_path_cost(self, cost):
@@ -146,9 +147,13 @@ def read_input():
     return (y_goal, pillars, disks)
 
 def take_cheapest_disks(disks_pairs, disk_size):
-    for t in disks_pairs:
-        if t[1] >= disk_size:
-            return t
+    for i in  range(0, len(disks_pairs)):
+        if disks_pairs[i][1] >= disk_size:
+            if disks_pairs[i][0] == disk_size and disks_pairs[i][1] != disk_size:
+                if i < len(disks_pairs)-1:
+                    return disks_pairs[i+1]
+            else:
+                return disks_pairs[i]
     return disks_pairs[0]
 
 def search (starting_pillars, W):
@@ -166,17 +171,19 @@ def search (starting_pillars, W):
     while(not paths_queue.empty()):
         now_pillar = paths_queue.get().item
         for adjacent_pillar in now_pillar.dict.items():
-            print("pillars: ")
-            print(now_pillar.x, now_pillar.y)
-            print(adjacent_pillar[0].x, adjacent_pillar[0].y)
-            print("costs: ")
+            #print("pillars: ")
+            #print(now_pillar.x, now_pillar.y)
+            #print(adjacent_pillar[0].x, adjacent_pillar[0].y)
+            #print("costs: ")
             new_disks = take_cheapest_disks(adjacent_pillar[0].dict[now_pillar], now_pillar.disk[0][0])
             new_cost = now_pillar.cost_path + new_disks[3] - now_pillar.cost #+ (now_pillar.dict[adjacent_pillar[0]][0][4] - now_pillar.disk[0][1]) #wrong, first check for our disk size. maybe we can use dictionary to access cheaper disk given the size
-            print(now_pillar.cost_path, new_cost)
-            print("\n")
+            #print(now_pillar.cost_path, new_cost, "new disk cost: ",new_disks[3], "now pillar cost: ",now_pillar.cost, now_pillar.disk[0][0])
+            #print(adjacent_pillar[0].dict[now_pillar])
+            #print("new disk: ",new_disks)
+            #print("\n")
             if adjacent_pillar[0].visited:
                 if new_cost < adjacent_pillar[0].cost_path:
-                    adjacent_pillar[0].set_starting_disk((new_disks[1], new_disks[4]))#something wrong here
+                    adjacent_pillar[0].set_starting_disk((new_disks[0], new_disks[4]))#something wrong here
                     adjacent_pillar[0].set_path_cost(new_cost)
                     paths_queue.put(PrioritizedItem(new_cost, adjacent_pillar[0]))
             else:
