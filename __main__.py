@@ -196,40 +196,6 @@ def search (starting_pillars, W):
             if adjacent_pillar[0].cost_path < final_value:
                 final_value = adjacent_pillar[0].cost_path
     print(final_value)
-    """
-    path = paths_queue.get()
-    dijkstra_pillars = path.item.pillars[-1].dict.items()
-    for reachable_pillar in dijkstra_pillars:
-        print(path.item.pillars)
-        new_size = 0
-        index = 0
-        print("pillar: ",path.item.pillars[-1].x ,path.item.pillars[-1].y)
-        print("pillar size: ",path.item.pillars[-1].disk[0][0])
-        while (path.item.pillars[-1].disk[0][0] > new_size): #size
-            
-            new_size = reachable_pillar[1][index][1]
-            #print("pillar size: ",path.item.pillars[-1].disk[0][0])
-            print("new pillar: ",reachable_pillar[1][index])
-            print("new pillar size: ",reachable_pillar[1][index][1])
-            index += 1
-        index -= 1
-        
-        print(reachable_pillar[0].x, reachable_pillar[0].y, reachable_pillar[0].visited, reachable_pillar[1][index][5], reachable_pillar[1][index][4])
-        new_cost = path.item.cost + reachable_pillar[1][index][5] + (reachable_pillar[1][index][4] - path.item.pillars[-1].cost) #wrong, first check for our disk size. maybe we can use dictionary to access cheaper disk given the size
-        if reachable_pillar[0].visited:
-            if reachable_pillar[0].cost > new_cost:
-                path.item.pillars.append(reachable_pillar[0])
-                new_path = Path(path)
-                reachable_pillar[0].set_starting_disk((reachable_pillar[1][0][2] ,reachable_pillar[1][0][5]))
-                paths_queue.put(PrioritizedItem(new_cost, new_path))
-        else:
-            reachable_pillar[0].visited = True
-            reachable_pillar[0].set_starting_disk((reachable_pillar[1][index][2] ,reachable_pillar[1][index][5]))
-            path.item.pillars.append(reachable_pillar[0])
-            print("path: ",path.item.pillars)
-            new_path = Path(path)
-            paths_queue.put(PrioritizedItem(new_cost, new_path))
-    """
     
 
     #now run dijkstra modified such that every time it checks if previous disk can be changed, if so checks 
