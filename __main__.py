@@ -35,6 +35,7 @@ class Pillar(object):
     def get_disks(self, pillar):
         return self.dict.get(pillar)
 
+
 def distance(p1,p2): 
     """ given two points, this function returns the (Pythogorean) distance between the two Pillar objects."""
     return math.sqrt(pow((p1.x - p2.x),2) + pow((p1.y - p2.y),2))
