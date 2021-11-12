@@ -34,18 +34,6 @@ class Pillar(object):
 
     def get_disks(self, pillar):
         return self.dict.get(pillar)
-"""
-class Path(object):
-    
-    def __init__(self, pillars):
-        #self.starting_pillar = starting_pillar
-        self.cost = pillars[-1].cost
-        self.pillars = pillars
-
-    def get_pillars(self):
-        return self.pillars
-"""
-
 
 def distance(p1,p2): 
     """ given two points, this function returns the (Pythogorean) distance between the two Pillar objects."""
