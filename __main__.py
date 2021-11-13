@@ -161,12 +161,16 @@ def search (starting_pillars, W):
     paths_queue = PriorityQueue()
     for p in starting_pillars:
         paths_queue.put(PrioritizedItem(p.cost, p))
-    final_value = 100000000000000000000
+    found = False
+    final_value = 0
     while(not paths_queue.empty()):
         now_pillar = paths_queue.get().item
         if now_pillar.reach_end:
             value = now_pillar.cost_path - now_pillar.cost + now_pillar.end_disk[1]
-            if value < final_value:
+            if not found:
+                final_value = value
+                found = True
+            elif value < final_value:
                 final_value = value
         for adjacent_pillar in now_pillar.dict.items():
             #print("pillars: ")
@@ -188,8 +192,10 @@ def search (starting_pillars, W):
                     adjacent_pillar[0].set_starting_disk((new_disks[0], new_disks[4]))
                     adjacent_pillar[0].set_path_cost(new_cost)
                     paths_queue.put(PrioritizedItem(new_cost, adjacent_pillar[0]))
-    print(final_value)
-
+    if found:
+        print(final_value)
+    else:
+        print("impossible")
 def search_path(W, starting_pillars):
     """search the least expensive path in the graph
 
