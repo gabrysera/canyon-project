@@ -56,10 +56,13 @@ def read_input():
             if int(r_i) < d[0]:
                 if int(c_i) >= d[1]:
                     valid = False
+            if int(r_i) > d[0]:
+                if int(c_i) <= d[1]:
+                    disks.remove(d)
         #also checks for later disks
         if valid:
             disks.append((int(r_i),int(c_i)))
-        disks.append((int(r_i),int(c_i)))
+        #disks.append((int(r_i),int(c_i)))
 
     return (y_goal, pillars_positions, disks)
 
@@ -146,7 +149,11 @@ def search_path(W, starting_pillars, pillars_positions, disks):
         if now_pillar.priority == now_pillar.item.path_cost:
             adjacency_pillars = find_neighbour_pillars(now_pillar.item, pillars_positions, disks ,dict)
             for new_pillar in adjacency_pillars:
-                paths_queue.put(PrioritizedItem(new_pillar.path_cost, new_pillar))
+                if already_found:
+                    if new_pillar.path_cost < final_value:
+                        paths_queue.put(PrioritizedItem(new_pillar.path_cost, new_pillar))
+                else:
+                    paths_queue.put(PrioritizedItem(new_pillar.path_cost, new_pillar))
     print(final_value)
 
 
