@@ -2,7 +2,7 @@ import math
 from dataclasses import dataclass, field
 from queue import PriorityQueue
 from typing import Any
-from typing_extensions import final
+
 import time 
 
 class Pillar(object):
@@ -131,18 +131,22 @@ def search_path(W, starting_pillars, pillars_positions, disks):
     for p in starting_pillars:
         paths_queue.put(PrioritizedItem(p.disk[1], p))
         dict[(p.x,p.y,p.disk[0])] = p 
-    final_value = 1000000000000000
+    already_found = False
+    final_value = 0
     while(not paths_queue.empty()):
         now_pillar = paths_queue.get()
-        if now_pillar.item.path_cost < final_value:
-            if now_pillar.item.y + now_pillar.item.disk[0] >= W:
+        if now_pillar.item.y + now_pillar.item.disk[0] >= W:
+            if already_found:
                 if now_pillar.item.path_cost < final_value:
-                    final_value = now_pillar.item.path_cost
-
-            if now_pillar.priority == now_pillar.item.path_cost:
-                adjacency_pillars = find_neighbour_pillars(now_pillar.item, pillars_positions, disks ,dict)
-                for new_pillar in adjacency_pillars:
-                    paths_queue.put(PrioritizedItem(new_pillar.path_cost, new_pillar))
+                    if now_pillar.item.path_cost < final_value:
+                        final_value = now_pillar.item.path_cost
+            else:
+                final_value = now_pillar.item.path_cost
+                already_found = True
+        if now_pillar.priority == now_pillar.item.path_cost:
+            adjacency_pillars = find_neighbour_pillars(now_pillar.item, pillars_positions, disks ,dict)
+            for new_pillar in adjacency_pillars:
+                paths_queue.put(PrioritizedItem(new_pillar.path_cost, new_pillar))
     print(final_value)
 
 
