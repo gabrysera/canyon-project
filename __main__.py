@@ -8,21 +8,22 @@ import time
 class Pillar(object):
     """ x and y coordinates for each pillar object has its  (for its placement on the graph). """
 
+
     def __init__(self, x, y, disk):  
-        self.x = x
-        self.y = y
-        self.start = False
-        self.reach_end = False
-        self.dict = {}
-        self.visited = False
+        self.x = x #x coordinate
+        self.y = y #y coordinate
+        self.start = False #is it the start node?
+        self.reach_end = False 
+        self.dict = {} #with pillars that can be reached as keys and the values being the distance to them
+        self.visited = False 
         self.disk = disk 
         self.previous_pillar = None
-        self.path_cost = disk[1]
+        self.path_cost = disk[1] #cost of the disk assigned to it
 
     def visit(self):
         self.visited = True
 
-    def set_disk(self, disk):#CHANGE NAME TO SET_DISK
+    def set_disk(self, disk):
         self.disk[0] = disk
         self.cost = self.disk[0][1]
         self.visited = True
@@ -36,17 +37,18 @@ class Pillar(object):
 
 
 def read_input(): 
+    
     """read the standard input and store pillars using pillar class, and then group them in a list, 
         save also the possible disks with their properties (radius, cost) in a list and store W value of the canyon.
     Returns:
         [type]: [description]
     """
-    number_of_pillars,m_kind_of_disks,y_goal = list(map(int, input().split()))
+    number_of_pillars,m_kind_of_disks,y_goal = list(map(int, input().split())) #y_goal is the width
     pillars_positions = []
     disks = []
     for i in range(0, number_of_pillars):
         (x_i,y_i) = list(map(int, input().split()))
-        pillars_positions.append(((int(x_i),int(y_i))))
+        pillars_positions.append(((int(x_i),int(y_i)))) #pillars_position is a list of tuples containing the coordinates of each tuple
 
     for i in range(0, m_kind_of_disks):
         valid = True
@@ -54,30 +56,32 @@ def read_input():
         #if new r_i is smaller than already existing r_j then c_i has to be smaller otherwise this disk is not appended
         for d in disks:
             if int(r_i) < d[0]:
-                if int(c_i) >= d[1]:
+                if int(c_i) >= d[1]: #self note: do we need input validation here?
                     valid = False
             if int(r_i) > d[0]:
                 if int(c_i) <= d[1]:
                     disks.remove(d)
         #also checks for later disks
         if valid:
-            disks.append((int(r_i),int(c_i)))
-        #disks.append((int(r_i),int(c_i)))
+            disks.append((int(r_i),int(c_i))) #disks is a list that contains the radius of the disk and its respective 
+                                                    #cost in a tuple for each different type of disc
 
-    return (y_goal, pillars_positions, disks)
+    return (y_goal, pillars_positions, disks) 
 
 def create_adjacency_matrix(W, pillars_positions, max_r, disks): 
     """ this function creates the adjacency list by using dictionaries with each pillar object as key and its 
     values including a nested dictionary of the nodes accessible to it and the cost to access it. """
     starting_pillars = []
     for p in pillars_positions:
-        if p[1] <= max_r:
+        if p[1] <= max_r: #a pillar is a possible starting point only if the y coordinate of the pillar is <= to the biggest 
+                                                              
+                                                                                            #radius disc available
             #take all the disks that p[1] can use to reach 0 and create a pillar for each disk.
             for d in disks:
                 if p[1] <= d[0]:
                     starting_pillars.append(Pillar(p[0],p[1],d))
                 else:
-                    break
+                    break #self note: no need to continue any further?(because the discs are only going to get bigger)
         #if p.y + max_r >= W:
             #take all the disks that p[1] can use to reach W and create a pillar for each disk.
         #    p.set_end_disk(disk_to_the_end(disks, p.y, W))
@@ -108,7 +112,7 @@ def find_neighbour_pillars(pillar, pillars_positions, disks ,dict):
     neighbour = []
     for pill in pillars_positions:
         for d in disks:
-            if distance(pillar.x, pillar.y, pill[0], pill[1]) <= pillar.disk[0] + d[0] and distance != 0.0:
+            if distance(pillar.x, pillar.y, pill[0], pill[1]) <= pillar.disk[0] + d[0] and distance != 0.0: #self note: im not sure what distance is doing here
                 if (pill[0], pill[1], d[0]) not in dict:
                     new_pillar = Pillar(pill[0], pill[1], d)
                     neighbour.append(new_pillar)
@@ -116,7 +120,7 @@ def find_neighbour_pillars(pillar, pillars_positions, disks ,dict):
                     dict[(pill[0], pill[1], d[0])].path_cost = pillar.path_cost + d[1]
                 elif dict[(pill[0], pill[1], d[0])].path_cost > pillar.path_cost + d[1]:
                     neighbour.append(Pillar(pill[0], pill[1], d))
-                    dict[(pill[0], pill[1], d[0])].path_cost = pillar.path_cost + d[1]
+                    dict[(pill[0], pill[1], d[0])].path_cost = pillar.path_cost + d[1] #if a smaller disc size is found that can also reach this neighbour, then update the cost of neighbour pillar to a new lower cost 
             else:
                 break
     return neighbour
@@ -129,16 +133,16 @@ def search_path(W, starting_pillars, pillars_positions, disks):
         priority: int
         item: Any=field(compare=False)
 
-    dict ={}
+    dict ={} #self note: what does this dict contain?
     paths_queue = PriorityQueue()
     for p in starting_pillars:
-        paths_queue.put(PrioritizedItem(p.disk[1], p))
-        dict[(p.x,p.y,p.disk[0])] = p 
+        paths_queue.put(PrioritizedItem(p.disk[1], p)) #//puts the cost of 
+        dict[(p.x,p.y,p.disk[0])] = p #adding the starting pillars coordinates and sice of disc to dict
     already_found = False
     final_value = 0
     while(not paths_queue.empty()):
         now_pillar = paths_queue.get()
-        if now_pillar.item.y + now_pillar.item.disk[0] >= W:
+        if now_pillar.item.y + now_pillar.item.disk[0] >= W: #if the y coordinate of pillar + the disc size reach the other side of canyon
             if already_found:
                 if now_pillar.item.path_cost < final_value:
                     if now_pillar.item.path_cost < final_value:
@@ -146,14 +150,14 @@ def search_path(W, starting_pillars, pillars_positions, disks):
             else:
                 final_value = now_pillar.item.path_cost
                 already_found = True
-        if now_pillar.priority == now_pillar.item.path_cost:
+        if now_pillar.priority == now_pillar.item.path_cost: #//
             adjacency_pillars = find_neighbour_pillars(now_pillar.item, pillars_positions, disks ,dict)
             for new_pillar in adjacency_pillars:
                 if already_found:
                     if new_pillar.path_cost < final_value:
-                        paths_queue.put(PrioritizedItem(new_pillar.path_cost, new_pillar))
+                        paths_queue.put(PrioritizedItem(new_pillar.path_cost, new_pillar)) #//
                 else:
-                    paths_queue.put(PrioritizedItem(new_pillar.path_cost, new_pillar))
+                    paths_queue.put(PrioritizedItem(new_pillar.path_cost, new_pillar)) #//
     print(final_value)
 
 
