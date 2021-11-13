@@ -90,6 +90,7 @@ def create_adjacency_matrix(W, pillars, disks_pairs, max_r, disks):
         if p.y + max_r >= W:
             p.set_end_disk(disk_to_the_end(disks, p.y, W))
             finish = True
+            print("finish")
         start_index += 1   
         reachable_pillars(p, pillars[start_index:], 2*max_r, disks_pairs) #instead of using max_r can we not use dist bbetween the points as threshold directly
     if not finish:
@@ -161,27 +162,17 @@ def search (starting_pillars, W):
     paths_queue = PriorityQueue()
     for p in starting_pillars:
         paths_queue.put(PrioritizedItem(p.cost, p))
-    found = False
-    final_value = 0
+    final_value = 100000000000000000000
     while(not paths_queue.empty()):
         now_pillar = paths_queue.get().item
         if now_pillar.reach_end:
+            print("hello there")
             value = now_pillar.cost_path - now_pillar.cost + now_pillar.end_disk[1]
-            if not found:
-                final_value = value
-                found = True
-            elif value < final_value:
+            if value < final_value:
                 final_value = value
         for adjacent_pillar in now_pillar.dict.items():
-            #print("pillars: ")
-            #print(now_pillar.x, now_pillar.y)
-            #print(adjacent_pillar[0].x, adjacent_pillar[0].y)
-            #print("costs: ")
             new_disks = take_cheapest_disks(adjacent_pillar[0].dict[now_pillar], now_pillar.disk[0][0])
             new_cost = now_pillar.cost_path + new_disks[3] - now_pillar.cost #+ (now_pillar.dict[adjacent_pillar[0]][0][4] - now_pillar.disk[0][1]) #wrong, first check for our disk size. maybe we can use dictionary to access cheaper disk given the size
-            #print("now pillar path cost: ",now_pillar.cost_path,"new cost: " ,new_cost, "new disk cost: ",new_disks[3], "now pillar cost: ",now_pillar.cost)
-            #print("new disk: ",new_disks, "\n", now_pillar.disk)
-            #print("\n")
             if new_cost < final_value:
                 if adjacent_pillar[0].visited:
                     if new_cost < adjacent_pillar[0].cost_path:
@@ -192,10 +183,8 @@ def search (starting_pillars, W):
                     adjacent_pillar[0].set_starting_disk((new_disks[0], new_disks[4]))
                     adjacent_pillar[0].set_path_cost(new_cost)
                     paths_queue.put(PrioritizedItem(new_cost, adjacent_pillar[0]))
-    if found:
-        print(final_value)
-    else:
-        print("impossible")
+    print(final_value)
+
 def search_path(W, starting_pillars):
     """search the least expensive path in the graph
 
