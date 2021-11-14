@@ -140,16 +140,16 @@ def search_path(W, starting_pillars, pillars_positions, disks):
     final_value = 0
     while(not paths_queue.empty()):
         now_pillar = paths_queue.get()
-        if now_pillar.item.y + now_pillar.item.disk[0] >= W: #if the y coordinate of pillar + the disc size reach the other side of canyon
+        if now_pillar[1].y + now_pillar[1].disk[0] >= W: #if the y coordinate of pillar + the disc size reach the other side of canyon
             if already_found:
-                if now_pillar.item.path_cost < final_value:
-                    if now_pillar.item.path_cost < final_value: #self note: extra line?
-                        final_value = now_pillar.item.path_cost
+                if now_pillar[1].path_cost < final_value:
+                    if now_pillar[1].path_cost < final_value: #self note: extra line?
+                        final_value = now_pillar[1].path_cost
             else:
-                final_value = now_pillar.item.path_cost
+                final_value = now_pillar[1].path_cost
                 already_found = True #self note: function of already_found?
-        if now_pillar.priority == now_pillar.item.path_cost: #self note: would just else work here?
-            adjacency_pillars = find_neighbour_pillars(now_pillar.item, pillars_positions, disks ,dict)
+        if now_pillar[0] == now_pillar[1].path_cost: #self note: would just else work here?
+            adjacency_pillars = find_neighbour_pillars(now_pillar[1], pillars_positions, disks ,dict)
             for new_pillar in adjacency_pillars:
                 if already_found:
                     if new_pillar.path_cost < final_value:
