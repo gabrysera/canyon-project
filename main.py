@@ -70,9 +70,6 @@ def create_adjacency_matrix(W, pillars_positions, max_r, disks):
                     starting_pillars.append(Pillar(p[0],p[1],d))
                 else:
                     break
-        #if p.y + max_r >= W:
-            #take all the disks that p[1] can use to reach W and create a pillar for each disk.
-        #    p.set_end_disk(disk_to_the_end(disks, p.y, W))
     return starting_pillars
 
 def create_graph(W, pillars_positions, disks): 
@@ -88,6 +85,7 @@ def create_graph(W, pillars_positions, disks):
     
     
     max_r = disks[0][0]
+    
     starting_pillars = create_adjacency_matrix(W, pillars_positions ,max_r, disks)#note: this functions returns two lists, not one, but i believe the second one is being ignored here
     #disks = sorted(disks, key = lambda x: x[1])
     return starting_pillars
