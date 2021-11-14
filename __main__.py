@@ -12,15 +12,12 @@ class Pillar(object):
         self.x = x
         self.y = y
         self.start = False
-        self.reach_end = False
-        self.dict = {}
         self.visited = False
         self.disk = disk 
-        self.previous_pillar = None
         self.path_cost = disk[1]
 
-    def visit(self):
-        self.visited = True
+    def __lt__(self, other):
+        return self.path_cost < other.path_cost
 
     def set_disk(self, disk):#CHANGE NAME TO SET_DISK
         self.disk[0] = disk
@@ -29,10 +26,6 @@ class Pillar(object):
 
     def set_path_cost(self, cost):
         self.path_cost = cost
-
-    def set_end_disk(self, end_disk):
-        self.end_disk = end_disk
-        self.reach_end = True
 
 
 def read_input(): 
@@ -124,36 +117,32 @@ def find_neighbour_pillars(pillar, pillars_positions, disks ,dict):
 
 def search_path(W, starting_pillars, pillars_positions, disks):
 
-    @dataclass(order=True)
-    class PrioritizedItem:
-        priority: int
-        item: Any=field(compare=False)
-
     dict ={}
     paths_queue = PriorityQueue()
     for p in starting_pillars:
-        paths_queue.put(PrioritizedItem(p.disk[1], p))
+        paths_queue.put((p.disk[1], p))
         dict[(p.x,p.y,p.disk[0])] = p 
     already_found = False
     final_value = 0
     while(not paths_queue.empty()):
         now_pillar = paths_queue.get()
-        if now_pillar.item.y + now_pillar.item.disk[0] >= W:
+        
+        if now_pillar[1].y + now_pillar[1].disk[0] >= W:
             if already_found:
-                if now_pillar.item.path_cost < final_value:
-                    if now_pillar.item.path_cost < final_value:
-                        final_value = now_pillar.item.path_cost
+                if now_pillar[1].path_cost < final_value:
+                    if now_pillar[1].path_cost < final_value:
+                        final_value = now_pillar[1].path_cost
             else:
-                final_value = now_pillar.item.path_cost
+                final_value = now_pillar[1].path_cost
                 already_found = True
-        if now_pillar.priority == now_pillar.item.path_cost:
-            adjacency_pillars = find_neighbour_pillars(now_pillar.item, pillars_positions, disks ,dict)
+        if now_pillar[0] == now_pillar[1].path_cost:
+            adjacency_pillars = find_neighbour_pillars(now_pillar[1], pillars_positions, disks ,dict)
             for new_pillar in adjacency_pillars:
                 if already_found:
                     if new_pillar.path_cost < final_value:
-                        paths_queue.put(PrioritizedItem(new_pillar.path_cost, new_pillar))
+                        paths_queue.put((new_pillar.path_cost, new_pillar))
                 else:
-                    paths_queue.put(PrioritizedItem(new_pillar.path_cost, new_pillar))
+                    paths_queue.put((new_pillar.path_cost, new_pillar))
     print(final_value)
 
 
