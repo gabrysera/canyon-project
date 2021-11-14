@@ -103,13 +103,13 @@ def find_neighbour_pillars(pillar, pillars_positions, disks ,dict):
                 for d in disks:
                     if distance(pillar.x, pillar.y, pill[0], pill[1]) <= pillar.disk[0] + d[0] and distance != 0.0:
                         if (pill[0], pill[1], d[0]) not in dict:
-                            new_pillar = Pillar(pill[0], pill[1], d)
+                            new_pillar = Pillar(pill[0], pill[1], (d[0], pillar.path_cost + d[1]))
                             neighbour.append(new_pillar)
                             dict[(pill[0], pill[1], d[0])] = new_pillar
-                            dict[(pill[0], pill[1], d[0])].path_cost = pillar.path_cost + d[1]
+                            #dict[(pill[0], pill[1], d[0])].path_cost = pillar.path_cost + d[1]
                         elif dict[(pill[0], pill[1], d[0])].path_cost > pillar.path_cost + d[1]:
-                            neighbour.append(Pillar(pill[0], pill[1], d))
-                            dict[(pill[0], pill[1], d[0])].path_cost = pillar.path_cost + d[1]
+                            neighbour.append(Pillar(pill[0], pill[1], (d[0], pillar.path_cost + d[1])))
+                            #dict[(pill[0], pill[1], d[0])].path_cost = pillar.path_cost + d[1]
                     else:
                         break
             else:
@@ -137,14 +137,14 @@ def search_path(W, starting_pillars, pillars_positions, disks):
             else:
                 final_value = now_pillar[1].path_cost
                 already_found = True
-        if now_pillar[0] == now_pillar[1].path_cost:
-            adjacency_pillars = find_neighbour_pillars(now_pillar[1], pillars_positions, disks ,dict)
-            for new_pillar in adjacency_pillars:
-                if already_found:
-                    if new_pillar.path_cost < final_value:
-                        paths_queue.put((new_pillar.path_cost, new_pillar))
-                else:
+        #if now_pillar[0] == now_pillar[1].path_cost:
+        adjacency_pillars = find_neighbour_pillars(now_pillar[1], pillars_positions, disks ,dict)
+        for new_pillar in adjacency_pillars:
+            if already_found:
+                if new_pillar.path_cost < final_value:
                     paths_queue.put((new_pillar.path_cost, new_pillar))
+            else:
+                paths_queue.put((new_pillar.path_cost , new_pillar))
     if already_found:
         print(final_value)
     else:
@@ -154,14 +154,14 @@ def search_path(W, starting_pillars, pillars_positions, disks):
 def main():
     """main function of the project, read the input, prepare the canyon graph and search the graph
     """
-    #t = time.time()
+    t = time.time()
     (W, pillars_positions, disks) = read_input()
     disks = sorted(disks, reverse = True)
     pillars_positions = sorted(pillars_positions)
     
     starting_pillars = create_graph(W, pillars_positions, disks)
     search_path(W, starting_pillars, pillars_positions, disks)
-    #print(time.time() - t)
+    print(time.time() - t)
 
 if __name__ == "__main__":
     main()
