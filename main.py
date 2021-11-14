@@ -1,7 +1,6 @@
 import math
-from dataclasses import dataclass, field
 from queue import PriorityQueue
-from typing import Any
+
 
 import time 
 
@@ -154,7 +153,6 @@ def main():
     disks = sorted(disks, reverse = True)
     starting_pillars = create_graph(W, pillars_positions, disks)
     search_path(W, starting_pillars, pillars_positions, disks)
-    # print(time.time() - t)
 
 if __name__ == "__main__":
     main()
