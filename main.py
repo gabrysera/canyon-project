@@ -168,8 +168,6 @@ def find_neighbour_pillars_inline(pillar, pillars_positions, disks ,dict):
                             #dict[(pill[0], pill[1], d[0])].path_cost = pillar.path_cost + d[1]
                     else:
                         break
-            else:
-                break
     return neighbour
 
 def search_path_in_line(W, starting_pillars, pillars_positions, disks):
@@ -193,12 +191,13 @@ def search_path_in_line(W, starting_pillars, pillars_positions, disks):
                 already_found = True
         #if now_pillar[0] == now_pillar[1].path_cost:
         adjacency_pillars = find_neighbour_pillars_inline(now_pillar[1], pillars_positions, disks ,dict)
+
         for new_pillar in adjacency_pillars:
             if already_found:
                 if new_pillar.path_cost < final_value:
-                    paths_queue.put((new_pillar.path_cost, new_pillar))
+                    paths_queue.put((new_pillar.path_cost + (W - new_pillar.y), new_pillar))
             else:
-                paths_queue.put((new_pillar.path_cost , new_pillar))
+                paths_queue.put((new_pillar.path_cost + (W - new_pillar.y) , new_pillar))
     if already_found:
         print(final_value)
     else:
@@ -214,7 +213,7 @@ def main():
     pillars_positions = sorted(pillars_positions)
     
     starting_pillars = create_graph(W, pillars_positions, disks)
-    inline = True
+    inline = False
     if inline:
         search_path_in_line(W, starting_pillars, pillars_positions, disks)
     else:
