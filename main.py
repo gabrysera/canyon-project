@@ -142,7 +142,10 @@ def search_path(W, starting_pillars, pillars_positions, disks):
                         paths_queue.put((new_pillar.path_cost, new_pillar))
                 else:
                     paths_queue.put((new_pillar.path_cost, new_pillar))
-    print(final_value)
+    if already_found:
+        print(final_value)
+    else:
+        print("impossible")
 
 
 def main():
