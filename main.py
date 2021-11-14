@@ -1,11 +1,5 @@
 import math
 from queue import PriorityQueue
-<<<<<<< HEAD
-from typing import Any, final
-=======
-
->>>>>>> 325c59d1cb5ed1ad0d8064bbbb6392982bc930aa
-
 import time 
 #documentation
 #testing
@@ -88,14 +82,10 @@ def create_adjacency_matrix(W, pillars_positions, max_r, disks):
                 if p[1] <= d[0]:
                     starting_pillars.append(Pillar(p[0],p[1],d))
                 else:
-<<<<<<< HEAD
                     break #self note: no need to continue any further?(because the discs are only going to get bigger)
         #if p.y + max_r >= W:
             #take all the disks that p[1] can use to reach W and create a pillar for each disk.
         #    p.set_end_disk(disk_to_the_end(disks, p.y, W))
-=======
-                    break
->>>>>>> 325c59d1cb5ed1ad0d8064bbbb6392982bc930aa
     return starting_pillars
 
 def create_graph(W, pillars_positions, disks): 
