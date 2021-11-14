@@ -101,7 +101,8 @@ def find_neighbour_pillars(pillar, pillars_positions, disks ,dict):
         if pill[0] >= pillar.x - max_r*2:
             if pill[0] <= pillar.x + max_r*2:
                 for d in disks:
-                    if distance(pillar.x, pillar.y, pill[0], pill[1]) <= pillar.disk[0] + d[0] and distance != 0.0:
+                    dist = distance(pillar.x, pillar.y, pill[0], pill[1])
+                    if dist <= pillar.disk[0] + d[0] and dist != 0.0:
                         if (pill[0], pill[1], d[0]) not in dict:
                             new_pillar = Pillar(pill[0], pill[1], (d[0], pillar.path_cost + d[1]))
                             neighbour.append(new_pillar)
@@ -157,7 +158,8 @@ def find_neighbour_pillars_inline(pillar, pillars_positions, disks ,dict):
         if pill[0] == pillar.x:
             if pill[1] > pillar.y:
                 for d in disks:
-                    if distance(pillar.x, pillar.y, pill[0], pill[1]) <= pillar.disk[0] + d[0] and distance != 0.0:
+                    dist = distance(pillar.x, pillar.y, pill[0], pill[1])
+                    if dist <= pillar.disk[0] + d[0]: # and dist != 0.0: - this is redundant now
                         if (pill[0], pill[1], d[0]) not in dict:
                             new_pillar = Pillar(pill[0], pill[1], (d[0], pillar.path_cost + d[1]))
                             neighbour.append(new_pillar)
@@ -168,6 +170,8 @@ def find_neighbour_pillars_inline(pillar, pillars_positions, disks ,dict):
                             #dict[(pill[0], pill[1], d[0])].path_cost = pillar.path_cost + d[1]
                     else:
                         break
+            # else:
+            #     break
     return neighbour
 
 def search_path_in_line(W, starting_pillars, pillars_positions, disks):
@@ -211,6 +215,7 @@ def main():
     (W, pillars_positions, disks) = read_input()
     disks = sorted(disks, reverse = True)
     pillars_positions = sorted(pillars_positions)
+    # pillars_positions = sorted(pillars_positions, key = lambda x: x[1])
     
     starting_pillars = create_graph(W, pillars_positions, disks)
     inline = False
