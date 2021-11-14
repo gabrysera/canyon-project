@@ -96,17 +96,22 @@ def distance(x1, y1, x2, y2):
 
 def find_neighbour_pillars(pillar, pillars_positions, disks ,dict):
     neighbour = []
+    max_r = disks[0][0]
     for pill in pillars_positions:
-        for d in disks:
-            if distance(pillar.x, pillar.y, pill[0], pill[1]) <= pillar.disk[0] + d[0] and distance != 0.0:
-                if (pill[0], pill[1], d[0]) not in dict:
-                    new_pillar = Pillar(pill[0], pill[1], d)
-                    neighbour.append(new_pillar)
-                    dict[(pill[0], pill[1], d[0])] = new_pillar
-                    dict[(pill[0], pill[1], d[0])].path_cost = pillar.path_cost + d[1]
-                elif dict[(pill[0], pill[1], d[0])].path_cost > pillar.path_cost + d[1]:
-                    neighbour.append(Pillar(pill[0], pill[1], d))
-                    dict[(pill[0], pill[1], d[0])].path_cost = pillar.path_cost + d[1]
+        if pill[0] >= pillar.x - max_r*2:
+            if pill[0] <= pillar.x + max_r*2:
+                for d in disks:
+                    if distance(pillar.x, pillar.y, pill[0], pill[1]) <= pillar.disk[0] + d[0] and distance != 0.0:
+                        if (pill[0], pill[1], d[0]) not in dict:
+                            new_pillar = Pillar(pill[0], pill[1], d)
+                            neighbour.append(new_pillar)
+                            dict[(pill[0], pill[1], d[0])] = new_pillar
+                            dict[(pill[0], pill[1], d[0])].path_cost = pillar.path_cost + d[1]
+                        elif dict[(pill[0], pill[1], d[0])].path_cost > pillar.path_cost + d[1]:
+                            neighbour.append(Pillar(pill[0], pill[1], d))
+                            dict[(pill[0], pill[1], d[0])].path_cost = pillar.path_cost + d[1]
+                    else:
+                        break
             else:
                 break
     return neighbour
@@ -152,8 +157,11 @@ def main():
     t = time.time()
     (W, pillars_positions, disks) = read_input()
     disks = sorted(disks, reverse = True)
+    pillars_positions = sorted(pillars_positions)
+    
     starting_pillars = create_graph(W, pillars_positions, disks)
     search_path(W, starting_pillars, pillars_positions, disks)
+    print(time.time() - t)
 
 if __name__ == "__main__":
     main()
