@@ -10,18 +10,12 @@ class Pillar(object):
     def __init__(self, x, y, disk):  
         self.x = x
         self.y = y
-        self.start = False
-        self.visited = False
+        #self.start = False
         self.disk = disk 
         self.path_cost = disk[1]
 
     def __lt__(self, other):
         return self.path_cost < other.path_cost
-
-    def set_disk(self, disk):#CHANGE NAME TO SET_DISK
-        self.disk[0] = disk
-        self.cost = self.disk[0][1]
-        self.visited = True
 
     def set_path_cost(self, cost):
         self.path_cost = cost
@@ -94,7 +88,7 @@ def distance(x1, y1, x2, y2):
     """ given two points, this function returns the (Pythogorean) distance between the two Pillar objects."""
     return math.sqrt(pow((x1 - x2),2) + pow((y1 - y2),2))
 
-def find_neighbour_pillars(pillar, pillars_positions, disks ,dict):
+def find_neighbour_pillars(pillar, pillars_positions, disks ,dict, final_value, already_found):
     neighbour = []
     max_r = disks[0][0]
     for pill in pillars_positions:
@@ -106,7 +100,9 @@ def find_neighbour_pillars(pillar, pillars_positions, disks ,dict):
                     #if distance holds, if so, if the other pillar path_cost is cheaper then do not add the current one to new neighbours.
                     
                     dist = distance(pillar.x, pillar.y, pill[0], pill[1])
-                    
+                    if already_found:
+                        if pillar.path_cost + d[1] >= final_value:
+                            break
                     if dist <= pillar.disk[0] + d[0] and dist != 0.0:
                         if (pill[0], pill[1], d[0]) not in dict:
                             new_pillar = Pillar(pill[0], pill[1], (d[0], pillar.path_cost + d[1]))
@@ -122,6 +118,31 @@ def find_neighbour_pillars(pillar, pillars_positions, disks ,dict):
                 break
     return neighbour
 
+def search_path_impossible(W, starting_pillars, pillars_positions, disks):
+
+    dict ={}
+    paths_queue = PriorityQueue()
+    for p in starting_pillars:
+        paths_queue.put((p.disk[1], p))
+        dict[(p.x,p.y,p.disk[0])] = p 
+    already_found = False
+    final_value = 0
+    while(not paths_queue.empty()):
+        now_pillar = paths_queue.get()
+        if now_pillar[0] == now_pillar[1].path_cost:
+            if now_pillar[1].y + now_pillar[1].disk[0] >= W:
+                if already_found:
+                    if now_pillar[1].path_cost < final_value:
+                        if now_pillar[1].path_cost < final_value:
+                            final_value = now_pillar[1].path_cost
+                else:
+                    final_value = now_pillar[1].path_cost
+                    already_found = True
+            #if now_pillar[0] == now_pillar[1].path_cost:
+            adjacency_pillars = find_neighbour_pillars(now_pillar[1], pillars_positions, disks ,dict ,final_value, already_found)
+            for new_pillar in adjacency_pillars:
+                paths_queue.put((new_pillar.path_cost , new_pillar))
+    return already_found
 
 def search_path(W, starting_pillars, pillars_positions, disks):
 
@@ -134,101 +155,42 @@ def search_path(W, starting_pillars, pillars_positions, disks):
     final_value = 0
     while(not paths_queue.empty()):
         now_pillar = paths_queue.get()
-        
-        if now_pillar[1].y + now_pillar[1].disk[0] >= W:
-            if already_found:
-                if now_pillar[1].path_cost < final_value:
+       
+        if now_pillar[0] == now_pillar[1].path_cost:
+            if now_pillar[1].y + now_pillar[1].disk[0] >= W:
+                if already_found:
                     if now_pillar[1].path_cost < final_value:
-                        final_value = now_pillar[1].path_cost
-            else:
-                final_value = now_pillar[1].path_cost
-                already_found = True
-        #if now_pillar[0] == now_pillar[1].path_cost:
-        adjacency_pillars = find_neighbour_pillars(now_pillar[1], pillars_positions, disks ,dict)
-        for new_pillar in adjacency_pillars:
-            if already_found:
-                if new_pillar.path_cost < final_value:
-                    paths_queue.put((new_pillar.path_cost, new_pillar))
-            else:
+                        if now_pillar[1].path_cost < final_value:
+                            final_value = now_pillar[1].path_cost
+                else:
+                    final_value = now_pillar[1].path_cost
+                    already_found = True
+            #if now_pillar[0] == now_pillar[1].path_cost:
+            adjacency_pillars = find_neighbour_pillars(now_pillar[1], pillars_positions, disks ,dict, final_value, already_found)
+            for new_pillar in adjacency_pillars:
                 paths_queue.put((new_pillar.path_cost , new_pillar))
     if already_found:
         print(final_value)
     else:
         print("impossible")
 
-def find_neighbour_pillars_inline(pillar, pillars_positions, disks ,dict):
-    neighbour = []
-    max_r = disks[0][0]
-    for pill in pillars_positions:
-        if pill[0] == pillar.x:
-            if pill[1] > pillar.y:
-                for d in disks:
-                    dist = distance(pillar.x, pillar.y, pill[0], pill[1])
-                    if dist <= pillar.disk[0] + d[0]: # and dist != 0.0: - this is redundant now
-                        if (pill[0], pill[1], d[0]) not in dict:
-                            new_pillar = Pillar(pill[0], pill[1], (d[0], pillar.path_cost + d[1]))
-                            neighbour.append(new_pillar)
-                            dict[(pill[0], pill[1], d[0])] = new_pillar
-                            #dict[(pill[0], pill[1], d[0])].path_cost = pillar.path_cost + d[1]
-                        elif dict[(pill[0], pill[1], d[0])].path_cost > pillar.path_cost + d[1]:
-                            neighbour.append(Pillar(pill[0], pill[1], (d[0], pillar.path_cost + d[1])))
-                            #dict[(pill[0], pill[1], d[0])].path_cost = pillar.path_cost + d[1]
-                    else:
-                        break
-            # else:
-            #     break
-    return neighbour
-
-def search_path_in_line(W, starting_pillars, pillars_positions, disks):
-    dict ={}
-    paths_queue = PriorityQueue()
-    for p in starting_pillars:
-        paths_queue.put((p.disk[1], p))
-        dict[(p.x,p.y,p.disk[0])] = p 
-    already_found = False
-    final_value = 0
-    while(not paths_queue.empty()):
-        now_pillar = paths_queue.get()
-        
-        if now_pillar[1].y + now_pillar[1].disk[0] >= W:
-            if already_found:
-                if now_pillar[1].path_cost < final_value:
-                    if now_pillar[1].path_cost < final_value:
-                        final_value = now_pillar[1].path_cost
-            else:
-                final_value = now_pillar[1].path_cost
-                already_found = True
-        #if now_pillar[0] == now_pillar[1].path_cost:
-        adjacency_pillars = find_neighbour_pillars_inline(now_pillar[1], pillars_positions, disks ,dict)
-
-        for new_pillar in adjacency_pillars:
-            if already_found:
-                if new_pillar.path_cost < final_value:
-                    paths_queue.put((new_pillar.path_cost + (W - new_pillar.y), new_pillar))
-            else:
-                paths_queue.put((new_pillar.path_cost + (W - new_pillar.y) , new_pillar))
-    if already_found:
-        print(final_value)
-    else:
-        print("impossible")
 
 
 def main():
     """main function of the project, read the input, prepare the canyon graph and search the graph
     """
-    t = time.time()
+    #t = time.time()
     (W, pillars_positions, disks) = read_input()
     disks = sorted(disks, reverse = True)
     pillars_positions = sorted(pillars_positions)
-    # pillars_positions = sorted(pillars_positions, key = lambda x: x[1])
     
-    starting_pillars = create_graph(W, pillars_positions, disks)
-    inline = False
-    if inline:
-        search_path_in_line(W, starting_pillars, pillars_positions, disks)
-    else:
+    starting_pillars_impossible = create_graph(W, pillars_positions, [disks[0]])
+    if search_path_impossible(W, starting_pillars_impossible, pillars_positions, [disks[0]]):
+        starting_pillars = create_graph(W, pillars_positions, disks)
         search_path(W, starting_pillars, pillars_positions, disks)
-    print(time.time() - t)
+    else:
+        print("impossible")
+    #print(time.time() - t)
 
 if __name__ == "__main__":
     main()
