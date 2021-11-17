@@ -101,6 +101,9 @@ def find_neighbour_pillars(pillar, pillars_positions, disks ,dict):
         if pill[0] >= pillar.x - max_r*2:
             if pill[0] <= pillar.x + max_r*2:
                 for d in disks:
+                    #check if also other pillars reach the new neighbour with this disk, if so , add only if path_cost is cheaper
+                    #to check for the other pillars we need another for loop for the disks, and then if disk in in dict, then check 
+                    #if distance holds, if so, if the other pillar path_cost is cheaper then do not add the current one to new neighbours.
                     dist = distance(pillar.x, pillar.y, pill[0], pill[1])
                     if dist <= pillar.disk[0] + d[0] and dist != 0.0:
                         if (pill[0], pill[1], d[0]) not in dict:
