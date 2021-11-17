@@ -183,7 +183,6 @@ def main():
     (W, pillars_positions, disks) = read_input()
     disks = sorted(disks, reverse = True)
     pillars_positions = sorted(pillars_positions)
-    
     starting_pillars_impossible = create_graph(W, pillars_positions, [disks[0]])
     if search_path_impossible(W, starting_pillars_impossible, pillars_positions, [disks[0]]):
         starting_pillars = create_graph(W, pillars_positions, disks)
