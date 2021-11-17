@@ -109,10 +109,10 @@ def find_neighbour_pillars(pillar, pillars_positions, disks ,dict, final_value, 
                             # neighbour.append(new_pillar)
                             dict[(pill[0], pill[1], d[0])] = new_pillar
                             new_dict[(pill[0], pill[1], d[0])] = new_pillar
-                        elif dict[(pill[0], pill[1], d[0])].path_cost > pillar.path_cost + d[1]:
-                            # neighbour.append(Pillar(pill[0], pill[1], (d[0], pillar.path_cost + d[1])))
-                            dict[(pill[0], pill[1], d[0])].path_cost = pillar.path_cost + d[1]
-                            new_dict[(pill[0], pill[1], d[0])].path_cost = pillar.path_cost + d[1]
+                        # elif dict[(pill[0], pill[1], d[0])].path_cost > pillar.path_cost + d[1]:
+                        #     # neighbour.append(Pillar(pill[0], pill[1], (d[0], pillar.path_cost + d[1])))
+                        #     dict[(pill[0], pill[1], d[0])].path_cost = pillar.path_cost + d[1]
+                        #     new_dict[(pill[0], pill[1], d[0])].path_cost = pillar.path_cost + d[1]
                             
                     else:
                         break
@@ -131,7 +131,6 @@ def search_path(W, starting_pillars, pillars_positions, disks):
     final_value = 0
     while(not paths_queue.empty()):
         now_pillar = paths_queue.get()
-       
         if now_pillar[0] == now_pillar[1].path_cost:
             if now_pillar[1].y + now_pillar[1].disk[0] >= W:
                 if already_found:
@@ -162,7 +161,6 @@ def search_path_impossible(W, starting_pillars, pillars_positions, disks):
     final_value = 0
     while(not paths_queue.empty()):
         now_pillar = paths_queue.get()
-       
         if now_pillar[0] == now_pillar[1].path_cost:
             if now_pillar[1].y + now_pillar[1].disk[0] >= W:
                 if already_found:
@@ -186,9 +184,10 @@ def search_path_impossible(W, starting_pillars, pillars_positions, disks):
 def main():
     """main function of the project, read the input, prepare the canyon graph and search the graph
     """
-    t = time.time()
+    # t = time.time()
     (W, pillars_positions, disks) = read_input()
     disks = sorted(disks, reverse = True)
+    # print(len(disks))
     pillars_positions = sorted(pillars_positions)
     starting_pillars_impossible = create_graph(W, pillars_positions, [disks[0]])
     #if search_path_impossible(W, starting_pillars_impossible, pillars_positions, [disks[0]]):
@@ -196,7 +195,7 @@ def main():
     search_path(W, starting_pillars, pillars_positions, disks)
     # else:
     #     print("impossible")
-    print(time.time() - t)
+    # print(time.time() - t)
 
 if __name__ == "__main__":
     main()
