@@ -10,9 +10,9 @@ class Pillar(object):
     def __init__(self, x, y, disk):  
         self.x = x
         self.y = y
-        #self.start = False
         self.disk = disk 
         self.path_cost = disk[1]
+        self.adjacency_pillars = {}
 
     def __lt__(self, other):
         return self.path_cost < other.path_cost
@@ -37,7 +37,6 @@ def read_input():
     for i in range(0, m_kind_of_disks):
         valid = True
         (r_i, c_i) = list(map(int, input().split()))
-        #if new r_i is smaller than already existing r_j then c_i has to be smaller otherwise this disk is not appended
         for d in disks:
             if int(r_i) < d[0]:
                 if int(c_i) >= d[1]:
@@ -45,20 +44,18 @@ def read_input():
             if int(r_i) > d[0]:
                 if int(c_i) <= d[1]:
                     disks.remove(d)
-        #also checks for later disks
         if valid:
             disks.append((int(r_i),int(c_i)))
-        #disks.append((int(r_i),int(c_i)))
+
 
     return (y_goal, pillars_positions, disks)
 
-def create_adjacency_matrix(W, pillars_positions, max_r, disks): 
+def create_adjacency(W, pillars_positions, max_r, disks): 
     """ this function creates the adjacency list by using dictionaries with each pillar object as key and its 
     values including a nested dictionary of the nodes accessible to it and the cost to access it. """
     starting_pillars = []
     for p in pillars_positions:
         if p[1] <= max_r:
-            #take all the disks that p[1] can use to reach 0 and create a pillar for each disk.
             for d in disks:
                 if p[1] <= d[0]:
                     starting_pillars.append(Pillar(p[0],p[1],d))
@@ -76,12 +73,8 @@ def create_graph(W, pillars_positions, disks):
         pillars ([pillar]): pillars of the canyon
         disks ([(Int,Int)]): list of available disks, the tuple contains the radius and the cost respectively
     """
-    
-    
     max_r = disks[0][0]
-    
-    starting_pillars = create_adjacency_matrix(W, pillars_positions ,max_r, disks)#note: this functions returns two lists, not one, but i believe the second one is being ignored here
-    #disks = sorted(disks, key = lambda x: x[1])
+    starting_pillars = create_adjacency(W, pillars_positions ,max_r, disks)
     return starting_pillars
 
 def distance(x1, y1, x2, y2): 
@@ -95,10 +88,6 @@ def find_neighbour_pillars(pillar, pillars_positions, disks ,dict, final_value, 
         if pill[0] >= pillar.x - max_r*2:
             if pill[0] <= pillar.x + max_r*2:
                 for d in disks:
-                    #check if also other pillars reach the new neighbour with this disk, if so , add only if path_cost is cheaper
-                    #to check for the other pillars we need another for loop for the disks, and then if disk in in dict, then check 
-                    #if distance holds, if so, if the other pillar path_cost is cheaper then do not add the current one to new neighbours.
-                    
                     dist = distance(pillar.x, pillar.y, pill[0], pill[1])
                     if already_found:
                         if pillar.path_cost + d[1] >= final_value:
@@ -108,12 +97,7 @@ def find_neighbour_pillars(pillar, pillars_positions, disks ,dict, final_value, 
                             new_pillar = Pillar(pill[0], pill[1], (d[0], pillar.path_cost + d[1]))
                             # neighbour.append(new_pillar)
                             dict[(pill[0], pill[1], d[0])] = new_pillar
-                            new_dict[(pill[0], pill[1], d[0])] = new_pillar
-                        # elif dict[(pill[0], pill[1], d[0])].path_cost > pillar.path_cost + d[1]:
-                        #     # neighbour.append(Pillar(pill[0], pill[1], (d[0], pillar.path_cost + d[1])))
-                        #     dict[(pill[0], pill[1], d[0])].path_cost = pillar.path_cost + d[1]
-                        #     new_dict[(pill[0], pill[1], d[0])].path_cost = pillar.path_cost + d[1]
-                            
+                            new_dict[(pill[0], pill[1], d[0])] = new_pillar      
                     else:
                         break
             else:
@@ -174,28 +158,25 @@ def search_path_impossible(W, starting_pillars, pillars_positions, disks):
             adjacency_pillars = find_neighbour_pillars(now_pillar[1], pillars_positions, disks ,dict ,final_value, already_found)
             for new_pillar_key in adjacency_pillars:
                 paths_queue.put((dict[new_pillar_key].path_cost , dict[new_pillar_key]))
-    if already_found:
-        print(final_value)
-    else:
-        print("impossible")
+    return already_found
 
 
 
 def main():
     """main function of the project, read the input, prepare the canyon graph and search the graph
     """
-    # t = time.time()
+    t = time.time()
     (W, pillars_positions, disks) = read_input()
     disks = sorted(disks, reverse = True)
-    # print(len(disks))
+
     pillars_positions = sorted(pillars_positions)
     starting_pillars_impossible = create_graph(W, pillars_positions, [disks[0]])
-    #if search_path_impossible(W, starting_pillars_impossible, pillars_positions, [disks[0]]):
-    starting_pillars = create_graph(W, pillars_positions, disks)
-    search_path(W, starting_pillars, pillars_positions, disks)
-    # else:
-    #     print("impossible")
-    # print(time.time() - t)
+    if search_path_impossible(W, starting_pillars_impossible, pillars_positions, [disks[0]]):
+        starting_pillars = create_graph(W, pillars_positions, disks)
+        search_path(W, starting_pillars, pillars_positions, disks)
+    else:
+        print("impossible")
+    print(time.time() - t)
 
 if __name__ == "__main__":
     main()
