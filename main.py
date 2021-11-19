@@ -1,9 +1,6 @@
 import math
 from queue import PriorityQueue
 
-
-import time 
-
 class Pillar(object):
     """ x and y coordinates for each pillar object has its  (for its placement on the graph). """
 
@@ -46,13 +43,9 @@ def read_input():
                     disks.remove(d)
         if valid:
             disks.append((int(r_i),int(c_i)))
-
-
     return (y_goal, pillars_positions, disks)
 
 def create_adjacency(W, pillars_positions, max_r, disks): 
-    """ this function creates the adjacency list by using dictionaries with each pillar object as key and its 
-    values including a nested dictionary of the nodes accessible to it and the cost to access it. """
     starting_pillars = []
     for p in pillars_positions:
         if p[1] <= max_r:
@@ -64,21 +57,11 @@ def create_adjacency(W, pillars_positions, max_r, disks):
     return starting_pillars
 
 def create_graph(W, pillars_positions, disks): 
-    """this function is used to create the graph of the canyo, in order to do that, for every pillar it will compute 
-    the distance with the others pillars and for the reachable ones it will add the possible pairs of pillars to use 
-    to reach that pillar with the reolated cost.
-    It will also determine for each pillar if its a starting pillar or not.
-    Args:
-        W (Int): max y value on the canyon.
-        pillars ([pillar]): pillars of the canyon
-        disks ([(Int,Int)]): list of available disks, the tuple contains the radius and the cost respectively
-    """
     max_r = disks[0][0]
     starting_pillars = create_adjacency(W, pillars_positions ,max_r, disks)
     return starting_pillars
 
 def distance(x1, y1, x2, y2): 
-    """ given two points, this function returns the (Pythogorean) distance between the two Pillar objects."""
     return math.sqrt(pow((x1 - x2),2) + pow((y1 - y2),2))
 
 def find_neighbour_pillars(pillar, pillars_positions, disks ,dict, final_value, already_found):
@@ -163,9 +146,6 @@ def search_path_impossible(W, starting_pillars, pillars_positions, disks):
 
 
 def main():
-    """main function of the project, read the input, prepare the canyon graph and search the graph
-    """
-    t = time.time()
     (W, pillars_positions, disks) = read_input()
     disks = sorted(disks, reverse = True)
 
@@ -176,7 +156,7 @@ def main():
         search_path(W, starting_pillars, pillars_positions, disks)
     else:
         print("impossible")
-    print(time.time() - t)
+
 
 if __name__ == "__main__":
     main()
