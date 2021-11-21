@@ -4,22 +4,21 @@ from queue import PriorityQueue
 class Pillar(object):
     """ x and y coordinates for each pillar object has its  (for its placement on the graph). """
 
-    def __init__(self, x, y, disk):  
+    def __init__(self, x, y, *args):  
         self.x = x
         self.y = y
-        self.disk = disk 
-        self.path_cost = disk[1]
+        self.disk = args[0] 
+        self.path_cost = self.disk[1]
+        if len(args) == 2:
+            self.path_cost = args[1]
         self.adjacency_pillars = {}
-        self.visited = False
+        
 
     def __lt__(self, other):
         return self.path_cost < other.path_cost
 
-    def set_path_cost(self, cost):
-        self.path_cost = cost
 
-    def set_adjacency_pillars(self, pillars):
-        self.adjacency_pillars = pillars
+
 
 
 def read_input(): 
@@ -100,22 +99,20 @@ def search_path(W, starting_pillars, pillars_positions, disks, impossible_check)
     final_value = 0
     while(not paths_queue.empty()):
         now_pillar = paths_queue.get()
-        if now_pillar[0] == now_pillar[1].path_cost:
-            if now_pillar[1].y + now_pillar[1].disk[0] >= W:
-                if already_found:
+        if now_pillar[1].y + now_pillar[1].disk[0] >= W:
+            if already_found:
+                if now_pillar[1].path_cost < final_value:
                     if now_pillar[1].path_cost < final_value:
-                        if now_pillar[1].path_cost < final_value:
-                            final_value = now_pillar[1].path_cost
-                else:
-                    if impossible_check:
-                        return 0
-                    final_value = now_pillar[1].path_cost
-                    already_found = True
-            #if now_pillar[0] == now_pillar[1].path_cost:
-            adjacency_pillars = find_neighbour_pillars(now_pillar[1], pillars_positions, disks ,dict ,final_value, already_found)
-            for new_pillar_key in adjacency_pillars:
-                obj = adjacency_pillars[new_pillar_key]
-                paths_queue.put((obj.path_cost , obj))
+                        final_value = now_pillar[1].path_cost
+            else:
+                if impossible_check:
+                    return 0
+                final_value = now_pillar[1].path_cost
+                already_found = True
+        adjacency_pillars = find_neighbour_pillars(now_pillar[1], pillars_positions, disks ,dict ,final_value, already_found)
+        for new_pillar_key in adjacency_pillars:
+            obj = adjacency_pillars[new_pillar_key]
+            paths_queue.put((obj.path_cost , obj))
     if already_found:
         return final_value
     else:
