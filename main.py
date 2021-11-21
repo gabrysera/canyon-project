@@ -72,8 +72,8 @@ def find_neighbour_pillars(pillar, pillars_positions, disks ,dict, final_value, 
     for pill in pillars_positions:
         if pill[0] >= pillar.x - max_r*2:
             if pill[0] <= pillar.x + max_r*2:
+                dist = distance(pillar.x, pillar.y, pill[0], pill[1])
                 for d in disks:
-                    dist = distance(pillar.x, pillar.y, pill[0], pill[1])
                     if already_found:
                         if pillar.path_cost + d[1] >= final_value:
                             break
@@ -90,7 +90,7 @@ def find_neighbour_pillars(pillar, pillars_positions, disks ,dict, final_value, 
     return new_dict
 
 
-def search_path(W, starting_pillars, pillars_positions, disks):
+def search_path(W, starting_pillars, pillars_positions, disks, impossible_check):
     dict ={}
     paths_queue = PriorityQueue()
     for p in starting_pillars:
@@ -107,6 +107,8 @@ def search_path(W, starting_pillars, pillars_positions, disks):
                         if now_pillar[1].path_cost < final_value:
                             final_value = now_pillar[1].path_cost
                 else:
+                    if impossible_check:
+                        return 0
                     final_value = now_pillar[1].path_cost
                     already_found = True
             #if now_pillar[0] == now_pillar[1].path_cost:
@@ -120,16 +122,17 @@ def search_path(W, starting_pillars, pillars_positions, disks):
         return "impossible"
 
 def main():
-
+    
     (W, pillars_positions, disks) = read_input()
     disks = sorted(disks, reverse = True)
     pillars_positions = sorted(pillars_positions)
     starting_pillars_impossible = create_graph(W, pillars_positions, [disks[0]])
-    if search_path(W, starting_pillars_impossible, pillars_positions, [disks[0]]) != "impossible":
+    if search_path(W, starting_pillars_impossible, pillars_positions, [disks[0]], True) != "impossible":
         starting_pillars = create_graph(W, pillars_positions, disks)
-        print(search_path(W, starting_pillars, pillars_positions, disks))
+        print(search_path(W, starting_pillars, pillars_positions, disks, False))
     else:
         print("impossible")
+    
 
 
 if __name__ == "__main__":
