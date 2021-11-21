@@ -78,7 +78,7 @@ def find_neighbour_pillars(pillar, pillars_positions, disks ,dict, final_value, 
                             break
                     if dist <= pillar.disk[0] + d[0] and dist != 0.0:
                         if (pill[0], pill[1], d[0]) not in dict:
-                            new_pillar = Pillar(pill[0], pill[1], (d[0], pillar.path_cost + d[1]))
+                            new_pillar = Pillar(pill[0], pill[1], d, pillar.path_cost + d[1])
                             # neighbour.append(new_pillar)
                             dict[(pill[0], pill[1], d[0])] = new_pillar
                             new_dict[(pill[0], pill[1], d[0])] = new_pillar      
